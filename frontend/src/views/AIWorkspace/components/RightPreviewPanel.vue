@@ -1,115 +1,110 @@
 <template>
   <div class="right-preview-panel">
+    <!-- 面板头部工具栏 -->
     <div class="panel-header">
       <div class="header-left">
-        <h2 class="panel-title">信息图预览</h2>
+        <CheckCircle2 :size="18" class="header-icon" />
+        <span class="header-title">信息图预览</span>
       </div>
       
       <div class="header-right" v-if="hasConfig">
-        <a-space>
-          <!-- 模板选择器 -->
-          <a-select
-            v-model:value="selectedTemplateId"
-            style="width: 200px"
-            placeholder="选择模板"
-            @change="handleTemplateChange"
+        <!-- 模板选择器 -->
+        <div class="template-selector" ref="dropdownRef">
+          <button 
+            class="selector-btn"
+            @click="toggleDropdown"
           >
-            <a-select-option
+            <span class="selector-label">信息图类型:</span>
+            <span class="selector-value">{{ currentTemplateName }}</span>
+            <ChevronDown :size="14" :class="['selector-arrow', { 'rotated': isDropdownOpen }]" />
+          </button>
+          
+          <!-- 下拉菜单 -->
+          <div v-if="isDropdownOpen" class="dropdown-menu">
+            <button
               v-for="rec in recommendations"
               :key="rec.templateId"
-              :value="rec.templateId"
+              class="dropdown-item"
+              :class="{ 'active': selectedTemplateId === rec.templateId }"
+              @click="handleTemplateSelect(rec.templateId)"
             >
-              {{ rec.templateName }} ({{ rec.matchScore }}%)
-            </a-select-option>
-          </a-select>
-          
-          <!-- 导出按钮 -->
-          <a-dropdown>
-            <template #overlay>
-              <a-menu @click="handleExport">
-                <a-menu-item key="svg">
-                  <FileImageOutlined /> 导出SVG
-                </a-menu-item>
-                <a-menu-item key="png">
-                  <PictureOutlined /> 导出PNG
-                </a-menu-item>
-                <a-menu-item key="pdf" disabled>
-                  <FilePdfOutlined /> 导出PDF (开发中)
-                </a-menu-item>
-                <a-menu-item key="pptx" disabled>
-                  <FileWordOutlined /> 导出PPTX (开发中)
-                </a-menu-item>
-              </a-menu>
-            </template>
-            <a-button>
-              <DownloadOutlined /> 导出
-            </a-button>
-          </a-dropdown>
-          
-          <!-- 保存按钮 -->
-          <a-button type="primary" @click="handleSave">
-            <SaveOutlined /> 保存
-          </a-button>
-        </a-space>
+              {{ rec.templateName }}
+              <Check v-if="selectedTemplateId === rec.templateId" :size="14" />
+            </button>
+          </div>
+        </div>
+        
+        <!-- 导出按钮 -->
+        <button class="action-btn" @click="handleExportClick">
+          <Download :size="14" />
+          <span class="btn-text">导出</span>
+        </button>
+        
+        <!-- 保存按钮 -->
+        <button class="action-btn primary" @click="handleSave">
+          <Save :size="14" />
+          <span class="btn-text">保存</span>
+        </button>
       </div>
     </div>
-    
+
+    <!-- 画布区域 -->
     <div class="panel-body">
       <!-- 空状态 -->
       <div v-if="!hasConfig" class="empty-state">
-         <a-empty description="请在左侧输入内容并点击「分析并推荐模板」开始">
-          <template #image>
-            <FileSearchOutlined style="font-size: 64px; color: #d9d9d9;" />
-          </template>
-        </a-empty>
+        <div class="empty-icon">
+          <Maximize :size="32" />
+        </div>
+        <p class="empty-text">在左侧输入内容并点击分析<br/>即可生成预览</p>
       </div>
       
       <!-- 加载状态 -->
       <div v-else-if="isGenerating" class="loading-state">
-        <a-spin size="large" tip="正在生成信息图...">
-          <div class="spin-content"></div>
-        </a-spin>
+        <div class="loading-spinner"></div>
+        <p class="loading-text">正在生成信息图...</p>
       </div>
       
-      <!-- 画布区域 -->
-      <div v-else class="canvas-container">
-        <div ref="canvasRef" class="canvas" id="infographic-canvas"></div>
+      <!-- 画布内容 -->
+      <div v-else class="canvas-wrapper">
+        <div 
+          class="canvas-content"
+          :style="{ transform: `scale(${zoomLevel})` }"
+        >
+          <div ref="canvasRef" class="canvas" id="infographic-canvas"></div>
+        </div>
+        
+        <!-- 缩放控制 -->
+        <div class="zoom-controls">
+          <button class="zoom-btn" @click="handleZoomOut" title="缩小">
+            <ZoomOut :size="16" />
+          </button>
+          <div class="zoom-divider"></div>
+          <button class="zoom-btn fit" @click="handleZoomReset" title="适应">
+            <Maximize :size="12" />
+            <span>适应</span>
+          </button>
+          <div class="zoom-divider"></div>
+          <button class="zoom-btn" @click="handleZoomIn" title="放大">
+            <ZoomIn :size="16" />
+          </button>
+        </div>
       </div>
-    </div>
-    
-    <!-- 底部操作栏 -->
-    <div class="panel-footer" v-if="hasConfig">
-      <a-space>
-        <a-button-group>
-          <a-button @click="handleZoomOut">
-            <ZoomOutOutlined /> 缩小
-          </a-button>
-          <a-button @click="handleZoomReset">
-            <FullscreenOutlined /> 适应
-          </a-button>
-          <a-button @click="handleZoomIn">
-            <ZoomInOutlined /> 放大
-          </a-button>
-        </a-button-group>
-      </a-space>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onUnmounted } from 'vue'
+import { ref, computed, watch, nextTick, onUnmounted, onMounted } from 'vue'
 import {
-  DownloadOutlined,
-  SaveOutlined,
-  FileImageOutlined,
-  PictureOutlined,
-  FilePdfOutlined,
-  FileWordOutlined,
-  FileSearchOutlined,
-  ZoomInOutlined,
-  ZoomOutOutlined,
-  FullscreenOutlined
-} from '@ant-design/icons-vue'
+  Download,
+  Save,
+  ZoomIn,
+  ZoomOut,
+  Maximize,
+  CheckCircle2,
+  ChevronDown,
+  Check
+} from 'lucide-vue-next'
 import { message } from 'ant-design-vue'
 import { useWorkspaceStore } from '@/stores/workspace'
 import { useTemplateStore } from '@/stores/template'
@@ -147,7 +142,9 @@ const workspaceStore = useWorkspaceStore()
 const templateStore = useTemplateStore()
 
 const canvasRef = ref<HTMLElement>()
+const dropdownRef = ref<HTMLElement>()
 const zoomLevel = ref(1)
+const isDropdownOpen = ref(false)
 let infographicInstance: any = null // 使用 any 避免类型问题
 
 // 计算属性
@@ -161,6 +158,27 @@ const selectedTemplateId = computed({
   set: (value) => {
     if (value) workspaceStore.setSelectedTemplate(value)
   }
+})
+
+const currentTemplateName = computed(() => {
+  const current = recommendations.value.find(r => r.templateId === selectedTemplateId.value)
+  return current?.templateName || '选择模板'
+})
+
+// 监听点击外部关闭下拉菜单
+onMounted(() => {
+  const handleClickOutside = (event: MouseEvent) => {
+    if (dropdownRef.value && !dropdownRef.value.contains(event.target as Node)) {
+      isDropdownOpen.value = false
+    }
+  }
+  
+  document.addEventListener('mousedown', handleClickOutside)
+  
+  // 组件卸载时移除监听
+  onUnmounted(() => {
+    document.removeEventListener('mousedown', handleClickOutside)
+  })
 })
 
 // 监听配置变化，渲染信息图
@@ -189,6 +207,44 @@ watch(config, async (newConfig) => {  console.log('[RightPreviewPanel] config变
 }, { deep: true, immediate: true })
 
 // 方法
+function toggleDropdown() {
+  isDropdownOpen.value = !isDropdownOpen.value
+}
+
+async function handleTemplateSelect(templateId: string) {
+  if (templateId === selectedTemplateId.value) {
+    isDropdownOpen.value = false
+    return
+  }
+  
+  try {
+    isDropdownOpen.value = false
+    message.loading('正在切换模板...', 0)
+    
+    // 重新生成信息图
+    workspaceStore.setGenerating(true)
+    const generateModule = await import('@/api/generate')
+    const response = await generateModule.generateAPI.extractData(workspaceStore.inputText, templateId)
+    
+    if (response.success && response.data) {
+      workspaceStore.setSelectedTemplate(templateId)
+      workspaceStore.setConfig(response.data.config)
+      message.destroy()
+      message.success('模板切换成功')
+    }
+  } catch (error: any) {
+    message.destroy()
+    message.error(error.message || '切换失败')
+  } finally {
+    workspaceStore.setGenerating(false)
+  }
+}
+
+function handleExportClick() {
+  // 目前直接导出PNG
+  handleExport({ key: 'png' })
+}
+
 function renderInfographic(cfg: any) {
   try {
     console.log('渲染配置:', cfg)
@@ -229,9 +285,9 @@ function renderInfographic(cfg: any) {
     infographicInstance.render()
     console.log('信息图渲染成功')
     message.success('信息图渲染成功')
-  } catch (error) {
+  } catch (error: any) {
     console.error('渲染失败:', error)
-    message.error('渲染失败')
+    message.error(`渲染失败: ${error.message || '未知错误'}`)
   }
 }
 
@@ -359,6 +415,10 @@ onUnmounted(() => {
   height: 100%;
   display: flex;
   flex-direction: column;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid #f0f0f0;
   overflow: hidden;
 }
 
@@ -370,61 +430,296 @@ onUnmounted(() => {
   background: #fff;
   border-bottom: 1px solid #f0f0f0;
   flex-shrink: 0;
+  position: relative;
+  z-index: 20;
 }
 
-.panel-title {
-  margin: 0;
-  font-size: 16px;
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-icon {
+  color: #3b82f6;
+}
+
+.header-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.template-selector {
+  position: relative;
+}
+
+.selector-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  font-size: 13px;
+  background: #f9fafb;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &:hover {
+    background: #f3f4f6;
+    border-color: #3b82f6;
+  }
+  
+  &:focus {
+    outline: none;
+    ring: 2px;
+    ring-color: rgba(59, 130, 246, 0.1);
+    border-color: #3b82f6;
+  }
+}
+
+.selector-label {
+  color: #6b7280;
+}
+
+.selector-value {
+  color: #111827;
   font-weight: 500;
-  color: #262626;
+  min-width: 80px;
+  text-align: left;
+}
+
+.selector-arrow {
+  color: #6b7280;
+  transition: transform 0.2s;
+  
+  &.rotated {
+    transform: rotate(180deg);
+  }
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 224px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #f0f0f0;
+  overflow: hidden;
+  z-index: 50;
+  animation: fadeIn 0.1s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.dropdown-item {
+  width: 100%;
+  text-align: left;
+  padding: 10px 16px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: #374151;
+  
+  &:hover {
+    background: #f9fafb;
+  }
+  
+  &.active {
+    color: #3b82f6;
+    background: #eff6ff;
+    font-weight: 500;
+  }
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  font-size: 13px;
+  color: #374151;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &:hover {
+    background: #f9fafb;
+    color: #3b82f6;
+  }
+  
+  &.primary {
+    color: white;
+    background: #3b82f6;
+    border-color: #3b82f6;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    
+    &:hover {
+      background: #2563eb;
+      border-color: #2563eb;
+    }
+  }
+}
+
+.btn-text {
+  @media (max-width: 640px) {
+    display: none;
+  }
 }
 
 .panel-body {
   flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
   position: relative;
   min-height: 0;
+  overflow: hidden;
+  background: #f9fafb;
 }
 
 .empty-state,
 .loading-state {
   height: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 16px;
 }
 
-.spin-content {
-  height: 200px;
-}
-
-.canvas-container {
-  padding: 12px;
-  min-height: 100%;
+.empty-icon {
+  width: 96px;
+  height: 96px;
+  background: #f3f4f6;
+  border-radius: 50%;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
+  color: #d1d5db;
+}
+
+.empty-text {
+  text-align: center;
+  color: #9ca3af;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-text {
+  color: #6b7280;
+  font-size: 14px;
+  margin: 0;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.canvas-wrapper {
+  height: 100%;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.canvas-content {
+  transition: transform 0.3s ease-out;
+  transform-origin: center;
+  background: #fff;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 32px 48px;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .canvas {
   width: 100%;
-  min-height: 500px;
-  background: #fff;
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
-  transform-origin: top center;
-  width: 100%;
-  max-width: 1200px;
+  min-height: 400px;
 }
 
-.panel-footer {
-  padding: 12px 16px;
+.zoom-controls {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
   background: #fff;
-  border-top: 1px solid #f0f0f0;
+  border-radius: 9999px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid #f0f0f0;
+  padding: 4px;
   display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 10;
+}
+
+.zoom-btn {
+  padding: 8px;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &:hover {
+    background: #f3f4f6;
+  }
+  
+  &.fit {
+    padding: 4px 8px;
+    gap: 4px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #4b5563;
+  }
+}
+
+.zoom-divider {
+  width: 1px;
+  height: 16px;
+  background: #e5e7eb;
 }
 </style>

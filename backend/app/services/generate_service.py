@@ -88,7 +88,11 @@ class GenerateService:
         
         # 获取AntV模板配置映射
         from app.services.template_service import TEMPLATE_DESIGN_MAP
-        template_design = TEMPLATE_DESIGN_MAP.get(template_id, {})
+        template_design = TEMPLATE_DESIGN_MAP.get(template_id)
+        
+        # 如果映射中不存在，尝试从模板对象中获取
+        if not template_design:
+            template_design = template.get("designConfig", {})
         
         # 构建完整的AntV Infographic配置
         config = {
@@ -96,6 +100,8 @@ class GenerateService:
             "data": extracted_data.get("data", {}),
             "themeConfig": extracted_data.get("themeConfig", {"palette": "antv"})
         }
+        
+        logger.info(f"Generated config for template {template_id}: {config}")
         
         extraction_time = round(time.time() - start_time, 2)
         

@@ -1,62 +1,54 @@
 <template>
   <div class="left-input-panel">
+    <!-- 面板头部 -->
     <div class="panel-header">
-      <h2 class="panel-title">输入内容</h2>
-      <span class="char-count">{{ charCount }} 字</span>
+      <div class="header-title">
+        <FileText :size="18" class="title-icon" />
+        <span class="title-text">输入内容</span>
+      </div>
+      <button 
+        class="clear-btn" 
+        @click="handleClear"
+        :disabled="!hasInput"
+        title="清空内容"
+      >
+        <Eraser :size="16" />
+      </button>
     </div>
-    
+
+    <!-- 文本输入区域 -->
     <div class="panel-body">
-      <a-textarea
-        v-model:value="inputText"
-        :placeholder="placeholder"
-        :rows="12"
-        :maxlength="5000"
-        show-count
+      <textarea
+        v-model="inputText"
         class="input-textarea"
-        @input="onInputChange"
+        :placeholder="placeholder"
+        :maxlength="5000"
       />
       
-      <div class="tips">
-        <a-alert
-          message="使用提示"
-          description="输入您想要可视化的内容，可以是步骤说明、对比分析、组织架构等。AI会自动分析并推荐最合适的信息图模板。"
-          type="info"
-          show-icon
-          closable
-        />
-      </div>
-    </div>
-    
-    <div class="panel-footer">
-      <a-space>
-        <a-button
-          type="primary"
-          size="large"
-          :loading="isAnalyzing"
-          :disabled="!hasValidInput"
+      <!-- 浮动操作按钮 -->
+      <div class="action-container">
+        <button
+          class="analyze-btn"
           @click="handleAnalyze"
+          :disabled="isAnalyzing || !hasValidInput"
         >
-          <template #icon>
-            <ThunderboltOutlined />
+          <template v-if="isAnalyzing">
+            <div class="loading-spinner"></div>
+            <span>分析中...</span>
           </template>
-          分析并推荐模板
-        </a-button>
-        
-        <a-button
-          size="large"
-          :disabled="!hasInput"
-          @click="handleClear"
-        >
-          清空
-        </a-button>
-      </a-space>
+          <template v-else>
+            <Sparkles :size="18" />
+            <span>分析并推荐模版</span>
+          </template>
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { ThunderboltOutlined } from '@ant-design/icons-vue'
+import { FileText, Sparkles, Eraser } from 'lucide-vue-next'
 import { message } from 'ant-design-vue'
 import { useWorkspaceStore } from '@/stores/workspace'
 import { useTemplateStore } from '@/stores/template'
@@ -64,23 +56,16 @@ import { useTemplateStore } from '@/stores/template'
 const workspaceStore = useWorkspaceStore()
 const templateStore = useTemplateStore()
 
-const placeholder = `请输入您想要可视化的内容，例如：
+const placeholder = `输入您想要的可视化内容,可以是步骤说明、对比分析、组织架构等。AI会自动分析并推荐最合适的信息图模板。
 
-1. 步骤说明：产品开发流程的5个关键步骤
-2. 对比分析：两个方案的优劣势对比
-3. 组织架构：公司的部门组织结构
-4. 时间线：项目的发展历程
-5. 数据展示：各部门的销售数据
-
-建议输入100-500字，内容越详细，AI推荐越准确。`
+例如:
+这里有一个四个阶段的产品开发流程。第一阶段是概念验证,通过率 10%;第二阶段是原型开发,通过率 30%;第三阶段是市场测试...`
 
 // 计算属性
 const inputText = computed({
   get: () => workspaceStore.inputText,
   set: (value) => workspaceStore.setInputText(value)
 })
-
-const charCount = computed(() => inputText.value.length)
 
 const hasInput = computed(() => workspaceStore.hasInput)
 
@@ -90,11 +75,6 @@ const hasValidInput = computed(() => {
 })
 
 const isAnalyzing = computed(() => workspaceStore.isAnalyzing)
-
-// 方法
-function onInputChange() {
-  // 输入改变时的处理
-}
 
 async function handleAnalyze() {
   if (!hasValidInput.value) {
@@ -167,7 +147,10 @@ function handleClear() {
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 16px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid #f0f0f0;
   overflow: hidden;
 }
 
@@ -175,61 +158,133 @@ function handleClear() {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
   flex-shrink: 0;
   background: #fff;
-  padding-bottom: 4px;
 }
 
-.panel-title {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 500;
-  color: #262626;
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #1f2937;
+  font-weight: 600;
+  font-size: 14px;
 }
 
-.char-count {
-  font-size: 12px;
-  color: #8c8c8c;
-  background: #fff;
-  padding: 2px 6px;
-  border-radius: 4px;
-  position: relative;
-  z-index: 10;
+.title-icon {
+  color: #3b82f6;
+}
+
+.clear-btn {
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &:hover:not(:disabled) {
+    background: #f3f4f6;
+    color: #6b7280;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 }
 
 .panel-body {
   flex: 1;
+  padding: 16px;
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  overflow-y: auto;
-  overflow-x: hidden;
   min-height: 0;
-  padding-bottom: 8px;
+  overflow: hidden;
 }
 
 .input-textarea {
+  width: 100%;
+  height: 100%;
   resize: none;
-  font-size: 14px;
+  outline: none;
+  border: none;
+  color: #4b5563;
   line-height: 1.6;
-  flex: 1;
-  min-height: 300px;
+  font-size: 14px;
+  background: transparent;
+  padding: 8px;
   
-  :deep(.ant-input) {
-    height: 100% !important;
-    overflow-y: auto !important;
+  &::placeholder {
+    color: #d1d5db;
+  }
+  
+  &:focus {
+    outline: none;
   }
 }
 
-.tips {
-  flex-shrink: 0;
+.action-container {
+  position: absolute;
+  bottom: 24px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  padding: 0 24px;
+  pointer-events: none;
 }
 
-.panel-footer {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid #f0f0f0;
-  flex-shrink: 0;
+.analyze-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 9999px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  color: white;
+  font-weight: 500;
+  transition: all 0.3s;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  pointer-events: auto;
+  
+  &:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+  
+  &:active:not(:disabled) {
+    transform: scale(0.95);
+  }
+  
+  &:disabled {
+    background: #d1d5db;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid white;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

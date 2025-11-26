@@ -309,8 +309,9 @@ def create_initial_templates() -> List[Dict[str, Any]]:
             },
             "design_config": {
                 "design": {
-                    "structure": {"type": "matrix-2x2"},
-                    "title": "default"
+                    "structure": {"type": "quadrant"},
+                    "title": "default",
+                    "item": "badge-card"
                 }
             },
             "tags": ["矩阵", "象限", "优先级"],
@@ -372,8 +373,9 @@ def create_initial_templates() -> List[Dict[str, Any]]:
             },
             "design_config": {
                 "design": {
-                    "structure": {"type": "chart-bar-vertical"},
-                    "title": "default"
+                    "structure": {"type": "chart-column"},
+                    "title": "default",
+                    "items": [{"type": "simple", "showIcon": False, "usePaletteColor": True}]
                 }
             },
             "tags": ["柱状图", "数据", "图表"],

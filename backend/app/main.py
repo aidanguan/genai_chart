@@ -26,10 +26,11 @@ app = FastAPI(
 )
 
 # 配置CORS
+logger.info(f"Allowed origins: {settings.allowed_origins_list}")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins_list,
-    allow_credentials=True,
+    allow_origins=["*"],  # 临时允许所有来源，用于调试
+    allow_credentials=False,  # 与allow_origins=["*"]一起使用
     allow_methods=["*"],
     allow_headers=["*"],
 )

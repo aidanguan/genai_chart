@@ -57,6 +57,41 @@ TEMPLATE_DESIGN_MAP = {
             "title": "default"
         }
     },
+    "matrix-2x2": {
+        "design": {
+            "structure": {"type": "quadrant"},
+            "title": "default",
+            "item": "badge-card"  # 使用badge-card样式展示矩阵项
+        }
+    },
+    "timeline-horizontal": {
+        "design": {
+            "structure": {"type": "timeline-horizontal"},
+            "title": "default",
+            "item": "badge-card"  # 时间线需要item配置
+        }
+    },
+    "comparison-two-column": {
+        "design": {
+            "structure": {"type": "comparison-column"},
+            "title": "default",
+            "item": "simple"  # 对比列表使用simple样式
+        }
+    },
+    "swot-analysis": {
+        "design": {
+            "structure": {"type": "quadrant-swot"},
+            "title": "default",
+            "item": "badge-card"  # SWOT分析使用badge-card
+        }
+    },
+    "org-tree": {
+        "design": {
+            "structure": {"type": "tree-org"},
+            "title": "default",
+            "item": "badge-card"  # 组织树使用badge-card
+        }
+    },
 }
 
 # 模板元数据（基于AntV Infographic内置模板）

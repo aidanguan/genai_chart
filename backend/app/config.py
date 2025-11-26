@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     DEBUG_MODE: bool = False
     
     # CORS配置
-    ALLOWED_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
+    ALLOWED_ORIGINS: str = "http://localhost:5173,http://localhost:5174,http://localhost:3000"
     
     # API配置
     API_PREFIX: str = "/api/v1"

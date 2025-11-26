@@ -452,9 +452,10 @@
     "design_config": {
       "design": {
         "structure": {
-          "type": "matrix-2x2"
+          "type": "quadrant"
         },
-        "title": "default"
+        "title": "default",
+        "item": "badge-card"
       }
     },
     "tags": [
@@ -546,9 +547,16 @@
     "design_config": {
       "design": {
         "structure": {
-          "type": "chart-bar-vertical"
+          "type": "chart-column"
         },
-        "title": "default"
+        "title": "default",
+        "items": [
+          {
+            "type": "simple",
+            "showIcon": false,
+            "usePaletteColor": true
+          }
+        ]
       }
     },
     "tags": [
