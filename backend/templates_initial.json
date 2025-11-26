@@ -1,0 +1,561 @@
+[
+  {
+    "id": "list-row-horizontal-icon-arrow",
+    "name": "图标横向流程图",
+    "category": "sequence",
+    "description": "带图标和箭头的横向流程图,视觉效果丰富",
+    "use_cases": "产品流程、服务流程、工作流程",
+    "preview_url": "",
+    "data_schema": {
+      "description": "横向流程图,带图标和箭头",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false,
+          "description": "标题"
+        },
+        "desc": {
+          "type": "string",
+          "required": false,
+          "description": "描述"
+        },
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "流程步骤列表",
+          "itemSchema": {
+            "label": {
+              "type": "string",
+              "required": true,
+              "description": "步骤名称"
+            },
+            "desc": {
+              "type": "string",
+              "required": false,
+              "description": "步骤描述"
+            },
+            "icon": {
+              "type": "string",
+              "required": false,
+              "description": "图标,格式:icon:mdi/iconname"
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "template": "list-row-horizontal-icon-arrow"
+    },
+    "tags": [
+      "流程",
+      "横向",
+      "图标",
+      "箭头"
+    ],
+    "sort_order": 100
+  },
+  {
+    "id": "timeline-horizontal",
+    "name": "横向时间轴",
+    "category": "sequence",
+    "description": "横向时间轴布局,适合展示发展历程",
+    "use_cases": "公司发展史、项目里程碑、产品迭代历程",
+    "preview_url": "",
+    "data_schema": {
+      "description": "横向时间轴",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false
+        },
+        "items": {
+          "type": "array",
+          "required": true,
+          "itemSchema": {
+            "time": {
+              "type": "string",
+              "required": true,
+              "description": "时间点"
+            },
+            "title": {
+              "type": "string",
+              "required": true,
+              "description": "事件标题"
+            },
+            "desc": {
+              "type": "string",
+              "required": false,
+              "description": "事件描述"
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "timeline-horizontal"
+        },
+        "title": "default"
+      }
+    },
+    "tags": [
+      "时间轴",
+      "历程",
+      "里程碑"
+    ],
+    "sort_order": 90
+  },
+  {
+    "id": "list-column-simple",
+    "name": "简单纵向列表",
+    "category": "list",
+    "description": "纵向列表布局,适合展示要点清单",
+    "use_cases": "操作步骤、注意事项、要点罗列",
+    "preview_url": "",
+    "data_schema": {
+      "description": "纵向列表",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false
+        },
+        "items": {
+          "type": "array",
+          "required": true,
+          "itemSchema": {
+            "label": {
+              "type": "string",
+              "required": true
+            },
+            "desc": {
+              "type": "string",
+              "required": false
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "list-column"
+        },
+        "title": "default",
+        "item": "simple"
+      }
+    },
+    "tags": [
+      "列表",
+      "纵向",
+      "清单"
+    ],
+    "sort_order": 80
+  },
+  {
+    "id": "checklist",
+    "name": "检查清单",
+    "category": "list",
+    "description": "带复选框的检查清单",
+    "use_cases": "任务清单、检查项、待办事项",
+    "preview_url": "",
+    "data_schema": {
+      "description": "检查清单",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false
+        },
+        "items": {
+          "type": "array",
+          "required": true,
+          "itemSchema": {
+            "label": {
+              "type": "string",
+              "required": true
+            },
+            "checked": {
+              "type": "boolean",
+              "required": false,
+              "description": "是否已完成"
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "list-checklist"
+        },
+        "title": "default"
+      }
+    },
+    "tags": [
+      "清单",
+      "检查",
+      "任务"
+    ],
+    "sort_order": 75
+  },
+  {
+    "id": "pyramid-layer",
+    "name": "金字塔层级图",
+    "category": "hierarchy",
+    "description": "金字塔型布局,展示层级结构",
+    "use_cases": "优先级展示、层级结构、组织架构",
+    "preview_url": "",
+    "data_schema": {
+      "description": "金字塔图",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false
+        },
+        "items": {
+          "type": "array",
+          "required": true,
+          "itemSchema": {
+            "label": {
+              "type": "string",
+              "required": true
+            },
+            "desc": {
+              "type": "string",
+              "required": false
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "list-pyramid"
+        },
+        "title": "default",
+        "items": [
+          {
+            "type": "badge-card"
+          }
+        ]
+      }
+    },
+    "tags": [
+      "金字塔",
+      "层级",
+      "优先级"
+    ],
+    "sort_order": 70
+  },
+  {
+    "id": "org-tree",
+    "name": "组织架构树",
+    "category": "hierarchy",
+    "description": "树形组织结构图",
+    "use_cases": "公司架构、部门结构、团队组成",
+    "preview_url": "",
+    "data_schema": {
+      "description": "组织架构树",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false
+        },
+        "root": {
+          "type": "object",
+          "required": true,
+          "description": "根节点",
+          "schema": {
+            "name": {
+              "type": "string",
+              "required": true
+            },
+            "position": {
+              "type": "string",
+              "required": false
+            },
+            "children": {
+              "type": "array",
+              "required": false
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "tree-org"
+        },
+        "title": "default"
+      }
+    },
+    "tags": [
+      "组织",
+      "架构",
+      "树形"
+    ],
+    "sort_order": 65
+  },
+  {
+    "id": "comparison-two-column",
+    "name": "双栏对比",
+    "category": "comparison",
+    "description": "左右双栏对比展示",
+    "use_cases": "产品对比、方案对比、优劣分析",
+    "preview_url": "",
+    "data_schema": {
+      "description": "双栏对比",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false
+        },
+        "left": {
+          "type": "object",
+          "required": true,
+          "schema": {
+            "title": {
+              "type": "string",
+              "required": true
+            },
+            "items": {
+              "type": "array",
+              "required": true
+            }
+          }
+        },
+        "right": {
+          "type": "object",
+          "required": true,
+          "schema": {
+            "title": {
+              "type": "string",
+              "required": true
+            },
+            "items": {
+              "type": "array",
+              "required": true
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "comparison-column"
+        },
+        "title": "default"
+      }
+    },
+    "tags": [
+      "对比",
+      "双栏",
+      "比较"
+    ],
+    "sort_order": 60
+  },
+  {
+    "id": "swot-analysis",
+    "name": "SWOT分析",
+    "category": "comparison",
+    "description": "SWOT四象限分析图",
+    "use_cases": "优势劣势分析、机会威胁分析、战略分析",
+    "preview_url": "",
+    "data_schema": {
+      "description": "SWOT分析",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false
+        },
+        "strengths": {
+          "type": "array",
+          "required": true,
+          "description": "优势"
+        },
+        "weaknesses": {
+          "type": "array",
+          "required": true,
+          "description": "劣势"
+        },
+        "opportunities": {
+          "type": "array",
+          "required": true,
+          "description": "机会"
+        },
+        "threats": {
+          "type": "array",
+          "required": true,
+          "description": "威胁"
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "quadrant-swot"
+        },
+        "title": "default"
+      }
+    },
+    "tags": [
+      "SWOT",
+      "分析",
+      "四象限"
+    ],
+    "sort_order": 55
+  },
+  {
+    "id": "matrix-2x2",
+    "name": "2x2矩阵",
+    "category": "quadrant",
+    "description": "经典2x2矩阵图",
+    "use_cases": "优先级矩阵、波士顿矩阵、风险评估",
+    "preview_url": "",
+    "data_schema": {
+      "description": "2x2矩阵",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false
+        },
+        "xAxis": {
+          "type": "string",
+          "required": true,
+          "description": "横轴标签"
+        },
+        "yAxis": {
+          "type": "string",
+          "required": true,
+          "description": "纵轴标签"
+        },
+        "quadrants": {
+          "type": "array",
+          "required": true,
+          "description": "四个象限数据",
+          "itemSchema": {
+            "label": {
+              "type": "string",
+              "required": true
+            },
+            "items": {
+              "type": "array",
+              "required": false
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "matrix-2x2"
+        },
+        "title": "default"
+      }
+    },
+    "tags": [
+      "矩阵",
+      "象限",
+      "优先级"
+    ],
+    "sort_order": 50
+  },
+  {
+    "id": "mindmap-radial",
+    "name": "放射状思维导图",
+    "category": "relation",
+    "description": "中心放射状关系图",
+    "use_cases": "思维导图、关联分析、概念地图",
+    "preview_url": "",
+    "data_schema": {
+      "description": "放射状思维导图",
+      "dataFields": {
+        "center": {
+          "type": "string",
+          "required": true,
+          "description": "中心主题"
+        },
+        "branches": {
+          "type": "array",
+          "required": true,
+          "description": "分支",
+          "itemSchema": {
+            "label": {
+              "type": "string",
+              "required": true
+            },
+            "children": {
+              "type": "array",
+              "required": false
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "mindmap-radial"
+        },
+        "title": "default"
+      }
+    },
+    "tags": [
+      "思维导图",
+      "关系",
+      "放射"
+    ],
+    "sort_order": 45
+  },
+  {
+    "id": "bar-chart-vertical",
+    "name": "垂直柱状图",
+    "category": "chart",
+    "description": "垂直方向的柱状图",
+    "use_cases": "数据对比、销售统计、指标展示",
+    "preview_url": "",
+    "data_schema": {
+      "description": "垂直柱状图",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false
+        },
+        "data": {
+          "type": "array",
+          "required": true,
+          "itemSchema": {
+            "label": {
+              "type": "string",
+              "required": true,
+              "description": "类别名称"
+            },
+            "value": {
+              "type": "number",
+              "required": true,
+              "description": "数值"
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "chart-bar-vertical"
+        },
+        "title": "default"
+      }
+    },
+    "tags": [
+      "柱状图",
+      "数据",
+      "图表"
+    ],
+    "sort_order": 40
+  }
+]
