@@ -52,9 +52,11 @@ import { FileText, Sparkles, Eraser } from 'lucide-vue-next'
 import { message } from 'ant-design-vue'
 import { useWorkspaceStore } from '@/stores/workspace'
 import { useTemplateStore } from '@/stores/template'
+import { useSettingsStore } from '@/stores/settings'
 
 const workspaceStore = useWorkspaceStore()
 const templateStore = useTemplateStore()
+const settingsStore = useSettingsStore()
 
 const placeholder = `输入您想要的可视化内容,可以是步骤说明、对比分析、组织架构等。AI会自动分析并推荐最合适的信息图模板。
 
@@ -112,11 +114,12 @@ async function handleGenerate(templateId: string) {
   try {
     workspaceStore.setGenerating(true)
     
-    // 调用数据提取API
+    // 调用数据提取API，传入LLM提供商配置
     const generateModule = await import('@/api/generate')
     const response = await generateModule.generateAPI.extractData(
       inputText.value,
-      templateId
+      templateId,
+      settingsStore.llmProvider  // 传入用户选择的LLM提供商
     )
     
     console.log('[LeftInputPanel] 数据提取响应:', response)
@@ -124,7 +127,10 @@ async function handleGenerate(templateId: string) {
     if (response.success && response.data) {
       console.log('[LeftInputPanel] 设置config:', response.data.config)
       workspaceStore.setConfig(response.data.config)
-      message.success('信息图生成成功！')
+      
+      // 显示使用的LLM提供商
+      const providerName = settingsStore.llmProvider === 'dify' ? 'Dify工作流' : '系统LLM'
+      message.success(`信息图生成成功！(使用${providerName})`)
     } else {
       message.error('生成失败')
     }

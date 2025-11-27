@@ -1,0 +1,237 @@
+[
+  {
+    "id": "sequence-circle-arrows",
+    "name": "圆形箭头流程",
+    "category": "sequence",
+    "structure_type": "sequence-circle-arrows",
+    "description": "圆形布局带箭头连接,强调循环和流转",
+    "keywords": "圆形,箭头,循环,闭环",
+    "use_cases": "循环流程、闭环系统、反馈机制、迭代开发",
+    "preview_url": "",
+    "data_schema": {
+      "description": "顺序流程数据",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false,
+          "description": "标题"
+        },
+        "desc": {
+          "type": "string",
+          "required": false,
+          "description": "描述"
+        },
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "流程步骤列表",
+          "itemSchema": {
+            "label": {
+              "type": "string",
+              "required": true,
+              "description": "步骤名称"
+            },
+            "desc": {
+              "type": "string",
+              "required": false,
+              "description": "步骤描述"
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "sequence-circle-arrows"
+        },
+        "title": "default",
+        "item": "simple"
+      }
+    },
+    "tags": [
+      "圆形",
+      "箭头",
+      "循环",
+      "闭环"
+    ],
+    "sort_order": 89,
+    "is_active": true
+  },
+  {
+    "id": "sequence-filter-mesh",
+    "name": "过滤网格流程",
+    "category": "sequence",
+    "structure_type": "sequence-filter-mesh",
+    "description": "网格过滤式流程布局,展示筛选过程",
+    "keywords": "过滤,网格,筛选,漏斗",
+    "use_cases": "筛选流程、过滤系统、分层处理、漏斗模型",
+    "preview_url": "",
+    "data_schema": {
+      "description": "顺序流程数据",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false,
+          "description": "标题"
+        },
+        "desc": {
+          "type": "string",
+          "required": false,
+          "description": "描述"
+        },
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "流程步骤列表",
+          "itemSchema": {
+            "label": {
+              "type": "string",
+              "required": true,
+              "description": "步骤名称"
+            },
+            "desc": {
+              "type": "string",
+              "required": false,
+              "description": "步骤描述"
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "sequence-filter-mesh"
+        },
+        "title": "default",
+        "item": "simple"
+      }
+    },
+    "tags": [
+      "过滤",
+      "网格",
+      "筛选",
+      "漏斗"
+    ],
+    "sort_order": 83,
+    "is_active": true
+  },
+  {
+    "id": "sequence-zigzag-pucks-3d",
+    "name": "3D曲棍球流程",
+    "category": "sequence",
+    "structure_type": "sequence-zigzag-pucks-3d",
+    "description": "3D曲棍球式布局,创意独特",
+    "keywords": "3D,创意,独特",
+    "use_cases": "创意展示、游戏流程",
+    "preview_url": "",
+    "data_schema": {
+      "description": "顺序流程数据",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false,
+          "description": "标题"
+        },
+        "desc": {
+          "type": "string",
+          "required": false,
+          "description": "描述"
+        },
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "流程步骤列表",
+          "itemSchema": {
+            "label": {
+              "type": "string",
+              "required": true,
+              "description": "步骤名称"
+            },
+            "desc": {
+              "type": "string",
+              "required": false,
+              "description": "步骤描述"
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "sequence-zigzag-pucks-3d"
+        },
+        "title": "default",
+        "item": "simple"
+      }
+    },
+    "tags": [
+      "3D",
+      "创意",
+      "独特"
+    ],
+    "sort_order": 78,
+    "is_active": true
+  },
+  {
+    "id": "list-row",
+    "name": "横向列表(基础)",
+    "category": "list",
+    "structure_type": "list-row",
+    "description": "横向排列的基础列表布局",
+    "keywords": "横向,列表,简单,基础",
+    "use_cases": "简单列举、横向步骤、选项展示",
+    "preview_url": "",
+    "data_schema": {
+      "description": "简单列表数据",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false,
+          "description": "标题"
+        },
+        "desc": {
+          "type": "string",
+          "required": false,
+          "description": "描述"
+        },
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "数据项列表",
+          "itemSchema": {
+            "label": {
+              "type": "string",
+              "required": true,
+              "description": "项目标题"
+            },
+            "desc": {
+              "type": "string",
+              "required": false,
+              "description": "项目描述"
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "list-row"
+        },
+        "title": "default",
+        "item": "simple"
+      }
+    },
+    "tags": [
+      "横向",
+      "列表",
+      "简单",
+      "基础"
+    ],
+    "sort_order": 74,
+    "is_active": true
+  }
+]

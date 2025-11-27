@@ -1,0 +1,1203 @@
+[
+  {
+    "id": "sequence-circular",
+    "name": "环形流程",
+    "category": "sequence",
+    "structure_type": "sequence-circular",
+    "description": "环形循环布局,强调周期性和循环性",
+    "keywords": "环形,循环,流程,周期",
+    "use_cases": "生命周期、循环流程、PDCA循环、迭代过程",
+    "preview_url": "",
+    "data_schema": {
+      "description": "顺序流程数据",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false,
+          "description": "标题"
+        },
+        "desc": {
+          "type": "string",
+          "required": false,
+          "description": "描述"
+        },
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "流程步骤列表",
+          "itemSchema": {
+            "label": {
+              "type": "string",
+              "required": true,
+              "description": "步骤名称"
+            },
+            "desc": {
+              "type": "string",
+              "required": false,
+              "description": "步骤描述"
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "sequence-circular"
+        },
+        "title": "default",
+        "item": "simple"
+      }
+    },
+    "tags": [
+      "环形",
+      "循环",
+      "流程",
+      "周期"
+    ],
+    "sort_order": 95,
+    "is_active": true
+  },
+  {
+    "id": "sequence-ascending-steps",
+    "name": "上升步骤",
+    "category": "sequence",
+    "structure_type": "sequence-ascending-steps",
+    "description": "阶梯上升布局,展示进阶或递进关系",
+    "keywords": "上升,阶梯,进阶,成长",
+    "use_cases": "成长路径、学习进阶、职业发展、等级制度",
+    "preview_url": "",
+    "data_schema": {
+      "description": "顺序流程数据",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false,
+          "description": "标题"
+        },
+        "desc": {
+          "type": "string",
+          "required": false,
+          "description": "描述"
+        },
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "流程步骤列表",
+          "itemSchema": {
+            "label": {
+              "type": "string",
+              "required": true,
+              "description": "步骤名称"
+            },
+            "desc": {
+              "type": "string",
+              "required": false,
+              "description": "步骤描述"
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "sequence-ascending-steps"
+        },
+        "title": "default",
+        "item": "simple"
+      }
+    },
+    "tags": [
+      "上升",
+      "阶梯",
+      "进阶",
+      "成长"
+    ],
+    "sort_order": 94,
+    "is_active": true
+  },
+  {
+    "id": "sequence-roadmap-vertical",
+    "name": "垂直路线图",
+    "category": "sequence",
+    "structure_type": "sequence-roadmap-vertical",
+    "description": "垂直方向的路线图布局",
+    "keywords": "路线图,规划,垂直,时间线",
+    "use_cases": "产品路线图、项目规划、发展路径",
+    "preview_url": "",
+    "data_schema": {
+      "description": "顺序流程数据",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false,
+          "description": "标题"
+        },
+        "desc": {
+          "type": "string",
+          "required": false,
+          "description": "描述"
+        },
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "流程步骤列表",
+          "itemSchema": {
+            "label": {
+              "type": "string",
+              "required": true,
+              "description": "步骤名称"
+            },
+            "desc": {
+              "type": "string",
+              "required": false,
+              "description": "步骤描述"
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "sequence-roadmap-vertical"
+        },
+        "title": "default",
+        "item": "simple"
+      }
+    },
+    "tags": [
+      "路线图",
+      "规划",
+      "垂直",
+      "时间线"
+    ],
+    "sort_order": 93,
+    "is_active": true
+  },
+  {
+    "id": "sequence-timeline",
+    "name": "标准时间轴",
+    "category": "sequence",
+    "structure_type": "sequence-timeline",
+    "description": "经典时间轴布局,展示时间序列事件",
+    "keywords": "时间轴,历史,时间线",
+    "use_cases": "历史事件、项目时间线、发展历程",
+    "preview_url": "",
+    "data_schema": {
+      "description": "顺序流程数据",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false,
+          "description": "标题"
+        },
+        "desc": {
+          "type": "string",
+          "required": false,
+          "description": "描述"
+        },
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "流程步骤列表",
+          "itemSchema": {
+            "label": {
+              "type": "string",
+              "required": true,
+              "description": "步骤名称"
+            },
+            "desc": {
+              "type": "string",
+              "required": false,
+              "description": "步骤描述"
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "sequence-timeline"
+        },
+        "title": "default",
+        "item": "simple"
+      }
+    },
+    "tags": [
+      "时间轴",
+      "历史",
+      "时间线"
+    ],
+    "sort_order": 92,
+    "is_active": true
+  },
+  {
+    "id": "sequence-snake-steps",
+    "name": "蛇形步骤",
+    "category": "sequence",
+    "structure_type": "sequence-snake-steps",
+    "description": "S形蛇形布局,适合长流程展示",
+    "keywords": "蛇形,流程,S形",
+    "use_cases": "复杂流程、多步骤操作、工艺流程",
+    "preview_url": "",
+    "data_schema": {
+      "description": "顺序流程数据",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false,
+          "description": "标题"
+        },
+        "desc": {
+          "type": "string",
+          "required": false,
+          "description": "描述"
+        },
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "流程步骤列表",
+          "itemSchema": {
+            "label": {
+              "type": "string",
+              "required": true,
+              "description": "步骤名称"
+            },
+            "desc": {
+              "type": "string",
+              "required": false,
+              "description": "步骤描述"
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "sequence-snake-steps"
+        },
+        "title": "default",
+        "item": "simple"
+      }
+    },
+    "tags": [
+      "蛇形",
+      "流程",
+      "S形"
+    ],
+    "sort_order": 91,
+    "is_active": true
+  },
+  {
+    "id": "sequence-steps",
+    "name": "简单步骤",
+    "category": "sequence",
+    "structure_type": "sequence-steps",
+    "description": "最简单的步骤流程图",
+    "keywords": "步骤,流程,简单",
+    "use_cases": "操作指南、简单流程、入门教程",
+    "preview_url": "",
+    "data_schema": {
+      "description": "顺序流程数据",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false,
+          "description": "标题"
+        },
+        "desc": {
+          "type": "string",
+          "required": false,
+          "description": "描述"
+        },
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "流程步骤列表",
+          "itemSchema": {
+            "label": {
+              "type": "string",
+              "required": true,
+              "description": "步骤名称"
+            },
+            "desc": {
+              "type": "string",
+              "required": false,
+              "description": "步骤描述"
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "sequence-steps"
+        },
+        "title": "default",
+        "item": "simple"
+      }
+    },
+    "tags": [
+      "步骤",
+      "流程",
+      "简单"
+    ],
+    "sort_order": 88,
+    "is_active": true
+  },
+  {
+    "id": "sequence-horizontal-zigzag",
+    "name": "横向Z字形",
+    "category": "sequence",
+    "structure_type": "sequence-horizontal-zigzag",
+    "description": "横向Z字形布局,节省空间",
+    "keywords": "Z字形,横向,流程",
+    "use_cases": "工作流程、业务流程、操作步骤",
+    "preview_url": "",
+    "data_schema": {
+      "description": "顺序流程数据",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false,
+          "description": "标题"
+        },
+        "desc": {
+          "type": "string",
+          "required": false,
+          "description": "描述"
+        },
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "流程步骤列表",
+          "itemSchema": {
+            "label": {
+              "type": "string",
+              "required": true,
+              "description": "步骤名称"
+            },
+            "desc": {
+              "type": "string",
+              "required": false,
+              "description": "步骤描述"
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "sequence-horizontal-zigzag"
+        },
+        "title": "default",
+        "item": "simple"
+      }
+    },
+    "tags": [
+      "Z字形",
+      "横向",
+      "流程"
+    ],
+    "sort_order": 87,
+    "is_active": true
+  },
+  {
+    "id": "sequence-mountain",
+    "name": "山峰型流程",
+    "category": "sequence",
+    "structure_type": "sequence-mountain",
+    "description": "山峰起伏型布局,视觉冲击力强",
+    "keywords": "山峰,起伏,视觉",
+    "use_cases": "挑战历程、项目阶段、发展波动",
+    "preview_url": "",
+    "data_schema": {
+      "description": "顺序流程数据",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false,
+          "description": "标题"
+        },
+        "desc": {
+          "type": "string",
+          "required": false,
+          "description": "描述"
+        },
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "流程步骤列表",
+          "itemSchema": {
+            "label": {
+              "type": "string",
+              "required": true,
+              "description": "步骤名称"
+            },
+            "desc": {
+              "type": "string",
+              "required": false,
+              "description": "步骤描述"
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "sequence-mountain"
+        },
+        "title": "default",
+        "item": "simple"
+      }
+    },
+    "tags": [
+      "山峰",
+      "起伏",
+      "视觉"
+    ],
+    "sort_order": 86,
+    "is_active": true
+  },
+  {
+    "id": "sequence-pyramid",
+    "name": "金字塔流程",
+    "category": "sequence",
+    "structure_type": "sequence-pyramid",
+    "description": "金字塔型流程布局",
+    "keywords": "金字塔,流程,递进",
+    "use_cases": "层层递进、汇聚流程、收敛过程",
+    "preview_url": "",
+    "data_schema": {
+      "description": "顺序流程数据",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false,
+          "description": "标题"
+        },
+        "desc": {
+          "type": "string",
+          "required": false,
+          "description": "描述"
+        },
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "流程步骤列表",
+          "itemSchema": {
+            "label": {
+              "type": "string",
+              "required": true,
+              "description": "步骤名称"
+            },
+            "desc": {
+              "type": "string",
+              "required": false,
+              "description": "步骤描述"
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "sequence-pyramid"
+        },
+        "title": "default",
+        "item": "simple"
+      }
+    },
+    "tags": [
+      "金字塔",
+      "流程",
+      "递进"
+    ],
+    "sort_order": 85,
+    "is_active": true
+  },
+  {
+    "id": "sequence-color-snake-steps",
+    "name": "彩色蛇形步骤",
+    "category": "sequence",
+    "structure_type": "sequence-color-snake-steps",
+    "description": "彩色蛇形布局,视觉丰富",
+    "keywords": "彩色,蛇形,流程",
+    "use_cases": "多阶段流程、彩色分类流程",
+    "preview_url": "",
+    "data_schema": {
+      "description": "顺序流程数据",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false,
+          "description": "标题"
+        },
+        "desc": {
+          "type": "string",
+          "required": false,
+          "description": "描述"
+        },
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "流程步骤列表",
+          "itemSchema": {
+            "label": {
+              "type": "string",
+              "required": true,
+              "description": "步骤名称"
+            },
+            "desc": {
+              "type": "string",
+              "required": false,
+              "description": "步骤描述"
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "sequence-color-snake-steps"
+        },
+        "title": "default",
+        "item": "simple"
+      }
+    },
+    "tags": [
+      "彩色",
+      "蛇形",
+      "流程"
+    ],
+    "sort_order": 84,
+    "is_active": true
+  },
+  {
+    "id": "list-grid",
+    "name": "网格列表",
+    "category": "list",
+    "structure_type": "list-grid",
+    "description": "网格布局展示多个项目,适合平铺展示",
+    "keywords": "网格,列表,平铺,卡片",
+    "use_cases": "产品展示、团队成员、功能特性、服务模块",
+    "preview_url": "",
+    "data_schema": {
+      "description": "简单列表数据",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false,
+          "description": "标题"
+        },
+        "desc": {
+          "type": "string",
+          "required": false,
+          "description": "描述"
+        },
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "数据项列表",
+          "itemSchema": {
+            "label": {
+              "type": "string",
+              "required": true,
+              "description": "项目标题"
+            },
+            "desc": {
+              "type": "string",
+              "required": false,
+              "description": "项目描述"
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "list-grid"
+        },
+        "title": "default",
+        "item": "simple"
+      }
+    },
+    "tags": [
+      "网格",
+      "列表",
+      "平铺",
+      "卡片"
+    ],
+    "sort_order": 78,
+    "is_active": true
+  },
+  {
+    "id": "list-sector",
+    "name": "扇形列表",
+    "category": "list",
+    "structure_type": "list-sector",
+    "description": "扇形分布的列表布局,视觉效果独特",
+    "keywords": "扇形,列表,放射,圆形",
+    "use_cases": "服务介绍、产品分类、特性展示、环形菜单",
+    "preview_url": "",
+    "data_schema": {
+      "description": "简单列表数据",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false,
+          "description": "标题"
+        },
+        "desc": {
+          "type": "string",
+          "required": false,
+          "description": "描述"
+        },
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "数据项列表",
+          "itemSchema": {
+            "label": {
+              "type": "string",
+              "required": true,
+              "description": "项目标题"
+            },
+            "desc": {
+              "type": "string",
+              "required": false,
+              "description": "项目描述"
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "list-sector"
+        },
+        "title": "default",
+        "item": "simple"
+      }
+    },
+    "tags": [
+      "扇形",
+      "列表",
+      "放射",
+      "圆形"
+    ],
+    "sort_order": 77,
+    "is_active": true
+  },
+  {
+    "id": "list-waterfall",
+    "name": "瀑布流列表",
+    "category": "list",
+    "structure_type": "list-waterfall",
+    "description": "瀑布流式布局,高度自适应",
+    "keywords": "瀑布流,列表,自适应",
+    "use_cases": "图片展示、内容流、社交动态",
+    "preview_url": "",
+    "data_schema": {
+      "description": "简单列表数据",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false,
+          "description": "标题"
+        },
+        "desc": {
+          "type": "string",
+          "required": false,
+          "description": "描述"
+        },
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "数据项列表",
+          "itemSchema": {
+            "label": {
+              "type": "string",
+              "required": true,
+              "description": "项目标题"
+            },
+            "desc": {
+              "type": "string",
+              "required": false,
+              "description": "项目描述"
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "list-waterfall"
+        },
+        "title": "default",
+        "item": "simple"
+      }
+    },
+    "tags": [
+      "瀑布流",
+      "列表",
+      "自适应"
+    ],
+    "sort_order": 76,
+    "is_active": true
+  },
+  {
+    "id": "compare-binary-horizontal",
+    "name": "横向二元对比",
+    "category": "comparison",
+    "structure_type": "compare-binary-horizontal",
+    "description": "左右二元对比布局",
+    "keywords": "对比,二元,左右",
+    "use_cases": "方案选择、AB对比、优缺点分析",
+    "preview_url": "",
+    "data_schema": {
+      "description": "二元对比数据",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false,
+          "description": "标题"
+        },
+        "left": {
+          "type": "object",
+          "required": true,
+          "description": "左侧数据",
+          "schema": {
+            "title": {
+              "type": "string",
+              "required": true,
+              "description": "左侧标题"
+            },
+            "items": {
+              "type": "array",
+              "required": true,
+              "description": "左侧项目"
+            }
+          }
+        },
+        "right": {
+          "type": "object",
+          "required": true,
+          "description": "右侧数据",
+          "schema": {
+            "title": {
+              "type": "string",
+              "required": true,
+              "description": "右侧标题"
+            },
+            "items": {
+              "type": "array",
+              "required": true,
+              "description": "右侧项目"
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "compare-binary-horizontal"
+        },
+        "title": "default",
+        "item": "simple"
+      }
+    },
+    "tags": [
+      "对比",
+      "二元",
+      "左右"
+    ],
+    "sort_order": 72,
+    "is_active": true
+  },
+  {
+    "id": "compare-hierarchy-left-right",
+    "name": "左右层级对比",
+    "category": "comparison",
+    "structure_type": "compare-hierarchy-left-right",
+    "description": "左右两侧的层级对比",
+    "keywords": "对比,层级,左右",
+    "use_cases": "复杂对比、多层级分析",
+    "preview_url": "",
+    "data_schema": {
+      "description": "二元对比数据",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false,
+          "description": "标题"
+        },
+        "left": {
+          "type": "object",
+          "required": true,
+          "description": "左侧数据",
+          "schema": {
+            "title": {
+              "type": "string",
+              "required": true,
+              "description": "左侧标题"
+            },
+            "items": {
+              "type": "array",
+              "required": true,
+              "description": "左侧项目"
+            }
+          }
+        },
+        "right": {
+          "type": "object",
+          "required": true,
+          "description": "右侧数据",
+          "schema": {
+            "title": {
+              "type": "string",
+              "required": true,
+              "description": "右侧标题"
+            },
+            "items": {
+              "type": "array",
+              "required": true,
+              "description": "右侧项目"
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "compare-hierarchy-left-right"
+        },
+        "title": "default",
+        "item": "simple"
+      }
+    },
+    "tags": [
+      "对比",
+      "层级",
+      "左右"
+    ],
+    "sort_order": 71,
+    "is_active": true
+  },
+  {
+    "id": "compare-hierarchy-row",
+    "name": "行层级对比",
+    "category": "comparison",
+    "structure_type": "compare-hierarchy-row",
+    "description": "行式层级对比布局",
+    "keywords": "对比,层级,行式",
+    "use_cases": "分类对比、多维度对比",
+    "preview_url": "",
+    "data_schema": {
+      "description": "二元对比数据",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false,
+          "description": "标题"
+        },
+        "left": {
+          "type": "object",
+          "required": true,
+          "description": "左侧数据",
+          "schema": {
+            "title": {
+              "type": "string",
+              "required": true,
+              "description": "左侧标题"
+            },
+            "items": {
+              "type": "array",
+              "required": true,
+              "description": "左侧项目"
+            }
+          }
+        },
+        "right": {
+          "type": "object",
+          "required": true,
+          "description": "右侧数据",
+          "schema": {
+            "title": {
+              "type": "string",
+              "required": true,
+              "description": "右侧标题"
+            },
+            "items": {
+              "type": "array",
+              "required": true,
+              "description": "右侧项目"
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "compare-hierarchy-row"
+        },
+        "title": "default",
+        "item": "simple"
+      }
+    },
+    "tags": [
+      "对比",
+      "层级",
+      "行式"
+    ],
+    "sort_order": 70,
+    "is_active": true
+  },
+  {
+    "id": "relation-circle",
+    "name": "圆形关系图",
+    "category": "relation",
+    "structure_type": "relation-circle",
+    "description": "圆形布局的关系网络",
+    "keywords": "关系,圆形,网络",
+    "use_cases": "中心辐射关系、核心关联、生态系统",
+    "preview_url": "",
+    "data_schema": {
+      "description": "关系网络数据",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false,
+          "description": "标题"
+        },
+        "center": {
+          "type": "string",
+          "required": true,
+          "description": "中心节点"
+        },
+        "nodes": {
+          "type": "array",
+          "required": true,
+          "description": "节点列表",
+          "itemSchema": {
+            "label": {
+              "type": "string",
+              "required": true,
+              "description": "节点名称"
+            },
+            "desc": {
+              "type": "string",
+              "required": false,
+              "description": "节点描述"
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "relation-circle"
+        },
+        "title": "default",
+        "item": "simple"
+      }
+    },
+    "tags": [
+      "关系",
+      "圆形",
+      "网络"
+    ],
+    "sort_order": 68,
+    "is_active": true
+  },
+  {
+    "id": "relation-network",
+    "name": "网络关系图",
+    "category": "relation",
+    "structure_type": "relation-network",
+    "description": "网状关系布局",
+    "keywords": "关系,网络,复杂",
+    "use_cases": "复杂关系网、社交网络、依赖关系",
+    "preview_url": "",
+    "data_schema": {
+      "description": "关系网络数据",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false,
+          "description": "标题"
+        },
+        "center": {
+          "type": "string",
+          "required": true,
+          "description": "中心节点"
+        },
+        "nodes": {
+          "type": "array",
+          "required": true,
+          "description": "节点列表",
+          "itemSchema": {
+            "label": {
+              "type": "string",
+              "required": true,
+              "description": "节点名称"
+            },
+            "desc": {
+              "type": "string",
+              "required": false,
+              "description": "节点描述"
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "relation-network"
+        },
+        "title": "default",
+        "item": "simple"
+      }
+    },
+    "tags": [
+      "关系",
+      "网络",
+      "复杂"
+    ],
+    "sort_order": 67,
+    "is_active": true
+  },
+  {
+    "id": "sequence-ascending-stairs-3d",
+    "name": "3D上升阶梯",
+    "category": "sequence",
+    "structure_type": "sequence-ascending-stairs-3d",
+    "description": "3D立体上升阶梯效果",
+    "keywords": "3D,阶梯,立体",
+    "use_cases": "进阶路径、等级体系、立体展示",
+    "preview_url": "",
+    "data_schema": {
+      "description": "顺序流程数据",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false,
+          "description": "标题"
+        },
+        "desc": {
+          "type": "string",
+          "required": false,
+          "description": "描述"
+        },
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "流程步骤列表",
+          "itemSchema": {
+            "label": {
+              "type": "string",
+              "required": true,
+              "description": "步骤名称"
+            },
+            "desc": {
+              "type": "string",
+              "required": false,
+              "description": "步骤描述"
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "sequence-ascending-stairs-3d"
+        },
+        "title": "default",
+        "item": "simple"
+      }
+    },
+    "tags": [
+      "3D",
+      "阶梯",
+      "立体"
+    ],
+    "sort_order": 82,
+    "is_active": true
+  },
+  {
+    "id": "sequence-cylinders-3d",
+    "name": "3D圆柱体流程",
+    "category": "sequence",
+    "structure_type": "sequence-cylinders-3d",
+    "description": "3D圆柱体布局,立体感强",
+    "keywords": "3D,圆柱,立体",
+    "use_cases": "数据处理流程、系统架构",
+    "preview_url": "",
+    "data_schema": {
+      "description": "顺序流程数据",
+      "dataFields": {
+        "title": {
+          "type": "string",
+          "required": false,
+          "description": "标题"
+        },
+        "desc": {
+          "type": "string",
+          "required": false,
+          "description": "描述"
+        },
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "流程步骤列表",
+          "itemSchema": {
+            "label": {
+              "type": "string",
+              "required": true,
+              "description": "步骤名称"
+            },
+            "desc": {
+              "type": "string",
+              "required": false,
+              "description": "步骤描述"
+            }
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {
+          "type": "sequence-cylinders-3d"
+        },
+        "title": "default",
+        "item": "simple"
+      }
+    },
+    "tags": [
+      "3D",
+      "圆柱",
+      "立体"
+    ],
+    "sort_order": 81,
+    "is_active": true
+  }
+]

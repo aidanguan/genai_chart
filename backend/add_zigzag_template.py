@@ -35,7 +35,8 @@ def add_template():
                         'description': '步骤列表',
                         'itemSchema': {
                             'label': {'type': 'string', 'required': True, 'description': '步骤名称'},
-                            'desc': {'type': 'string', 'required': False, 'description': '步骤描述'}
+                            'desc': {'type': 'string', 'required': False, 'description': '步骤描述'},
+                            'icon': {'type': 'string', 'required': False, 'description': '图标，格式：icon:集合名/图标名，如icon:mdi/check-circle'}
                         }
                     }
                 }

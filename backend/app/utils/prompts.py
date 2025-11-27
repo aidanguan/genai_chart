@@ -171,10 +171,18 @@ def get_data_extract_prompt(
 关键字段说明：
 - title: 信息图的标题（如果文本没有明确标题，可以根据内容生成一个简洁的标题）
 - desc: 信息图的描述或副标题
-- items: 数据项列表，每个item包含label（标签）、desc（描述）等字段
+- items: 数据项列表，每个item包含label（标签）、desc（描述）、icon（图标）等字段
   * label: 简短的标题或名称
   * desc: 详细的描述内容
-  * icon: 图标标识（如果适用），格式如"icon:mdi/check"
+  * icon: **必须生成**图标字段，使用iconify格式"icon:mdi/图标名"（仅使用mdi集合），例如：
+    - 需求分析: "icon:mdi/chart-line" 或 "icon:mdi/clipboard-text"
+    - 设计: "icon:mdi/palette" 或 "icon:mdi/draw"
+    - 开发: "icon:mdi/code-braces" 或 "icon:mdi/laptop"
+    - 测试: "icon:mdi/test-tube" 或 "icon:mdi/bug"
+    - 部署: "icon:mdi/rocket-launch" 或 "icon:mdi/cloud-upload"
+    - 分析: "icon:mdi/magnify" 或 "icon:mdi/chart-bar"
+    - 创新: "icon:mdi/lightbulb" 或 "icon:mdi/creation"
+    请根据每个步骤的含义选择合适的mdi图标，可在 https://icon-sets.iconify.design/mdi/ 查找更多图标
 
 请严格按照JSON格式返回提取的数据，**不要包含任何markdown代码块标记(如```json)**,不要包含任何其他文字说明,直接返回JSON对象:
 
@@ -186,7 +194,8 @@ def get_data_extract_prompt(
     "items": [
       {{
         "label": "项目标签",
-        "desc": "项目描述"
+        "desc": "项目描述",
+        "icon": "icon:mdi/相关图标名"
       }}
     ]
   }},

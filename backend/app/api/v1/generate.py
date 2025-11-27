@@ -66,12 +66,14 @@ async def extract_data(request: DataExtractRequest):
     
     - **text**: 用户输入的文本内容
     - **templateId**: 使用的模板ID
+    - **llmProvider**: LLM提供商 (system 或 dify)，默认system
     """
     try:
         generate_service = get_generate_service()
         result = await generate_service.extract_data(
             user_text=request.text,
-            template_id=request.templateId
+            template_id=request.templateId,
+            force_provider=request.llmProvider  # 传递用户选择的提供商
         )
         
         return APIResponse(

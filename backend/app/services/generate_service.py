@@ -159,7 +159,8 @@ class GenerateService:
     async def extract_data(
         self,
         user_text: str,
-        template_id: str
+        template_id: str,
+        force_provider: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         提取结构化数据
@@ -168,6 +169,7 @@ class GenerateService:
         Args:
             user_text: 用户输入的文本
             template_id: 模板ID
+            force_provider: 强制使用的提供商 ('system' 或 'dify')，None表示自动选择
         
         Returns:
             Dict: {
@@ -184,7 +186,36 @@ class GenerateService:
         if not template:
             raise ValueError(f"模板ID不存在: {template_id}")
         
-        # 检查是否启用了Dify工作流
+        # 如果强制指定使用系统LLM
+        if force_provider == 'system':
+            logger.info(f"[ExtractData] 用户强制使用系统LLM - 模板: {template_id}")
+            result = await self._extract_data_with_system_llm(
+                user_text=user_text,
+                template_id=template_id,
+                template=template
+            )
+            extraction_time = round(time.time() - start_time, 2)
+            result['extractionTime'] = extraction_time
+            return result
+        
+        # 如果强制指定使用Dify
+        if force_provider == 'dify':
+            logger.info(f"[ExtractData] 用户强制使用Dify工作流 - 模板: {template_id}")
+            try:
+                result = await self._extract_data_with_dify(
+                    user_text=user_text,
+                    template_id=template_id,
+                    template=template
+                )
+                extraction_time = round(time.time() - start_time, 2)
+                result['extractionTime'] = extraction_time
+                return result
+            except Exception as e:
+                logger.error(f"[ExtractData] Dify工作流调用失败: {e}")
+                # 强制使用Dify时失败则直接抛出异常，不回退
+                raise ValueError(f"Dify工作流调用失败: {str(e)}")
+        
+        # 自动选择：检查是否启用了Dify工作流
         workflow_enabled = self.workflow_mapper.is_workflow_enabled(template_id)
         logger.info(f"[ExtractData] 模板{template_id}工作流启用状态: {workflow_enabled}")
         

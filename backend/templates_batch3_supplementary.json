@@ -1,0 +1,518 @@
+[
+  {
+    "id": "list-grid-icon-card",
+    "name": "图标网格列表",
+    "category": "list",
+    "structure_type": "list-grid",
+    "description": "网格布局配合图标卡片,适合展示多个功能或服务",
+    "keywords": "网格,图标,卡片,功能展示",
+    "use_cases": "功能模块展示、服务介绍、产品特性、应用中心",
+    "preview_url": "",
+    "data_schema": {
+      "description": "简单列表数据",
+      "dataFields": {
+        "title": {"type": "string", "required": false, "description": "标题"},
+        "desc": {"type": "string", "required": false, "description": "描述"},
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "数据项列表",
+          "itemSchema": {
+            "label": {"type": "string", "required": true, "description": "项目标题"},
+            "desc": {"type": "string", "required": false, "description": "项目描述"},
+            "icon": {"type": "string", "required": false, "description": "图标"}
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {"type": "list-grid"},
+        "title": "default",
+        "item": "icon-card"
+      }
+    },
+    "tags": ["网格", "图标", "卡片", "功能"],
+    "sort_order": 77,
+    "is_active": true
+  },
+  {
+    "id": "list-grid-badge-card",
+    "name": "徽章网格卡片",
+    "category": "list",
+    "structure_type": "list-grid",
+    "description": "网格布局配合徽章卡片,带序号标识",
+    "keywords": "网格,徽章,卡片,序号",
+    "use_cases": "排名展示、步骤说明、等级展示、奖项列举",
+    "preview_url": "",
+    "data_schema": {
+      "description": "简单列表数据",
+      "dataFields": {
+        "title": {"type": "string", "required": false, "description": "标题"},
+        "desc": {"type": "string", "required": false, "description": "描述"},
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "数据项列表",
+          "itemSchema": {
+            "label": {"type": "string", "required": true, "description": "项目标题"},
+            "desc": {"type": "string", "required": false, "description": "项目描述"}
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {"type": "list-grid"},
+        "title": "default",
+        "item": "badge-card"
+      }
+    },
+    "tags": ["网格", "徽章", "卡片", "排名"],
+    "sort_order": 76,
+    "is_active": true
+  },
+  {
+    "id": "list-column-icon-card",
+    "name": "纵向图标卡片列表",
+    "category": "list",
+    "structure_type": "list-column",
+    "description": "纵向布局配合图标卡片,适合功能列表",
+    "keywords": "纵向,列表,图标,卡片",
+    "use_cases": "功能清单、服务列表、特性说明",
+    "preview_url": "",
+    "data_schema": {
+      "description": "简单列表数据",
+      "dataFields": {
+        "title": {"type": "string", "required": false, "description": "标题"},
+        "desc": {"type": "string", "required": false, "description": "描述"},
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "数据项列表",
+          "itemSchema": {
+            "label": {"type": "string", "required": true, "description": "项目标题"},
+            "desc": {"type": "string", "required": false, "description": "项目描述"},
+            "icon": {"type": "string", "required": false, "description": "图标"}
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {"type": "list-column"},
+        "title": "default",
+        "item": "icon-card"
+      }
+    },
+    "tags": ["纵向", "图标", "卡片", "列表"],
+    "sort_order": 75,
+    "is_active": true
+  },
+  {
+    "id": "list-row-icon-badge",
+    "name": "横向图标徽章列表",
+    "category": "list",
+    "structure_type": "list-row",
+    "description": "横向布局配合图标徽章,紧凑展示",
+    "keywords": "横向,图标,徽章,紧凑",
+    "use_cases": "导航栏、标签页、功能按钮组",
+    "preview_url": "",
+    "data_schema": {
+      "description": "简单列表数据",
+      "dataFields": {
+        "title": {"type": "string", "required": false, "description": "标题"},
+        "desc": {"type": "string", "required": false, "description": "描述"},
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "数据项列表",
+          "itemSchema": {
+            "label": {"type": "string", "required": true, "description": "项目标题"},
+            "icon": {"type": "string", "required": false, "description": "图标"}
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {"type": "list-row"},
+        "title": "default",
+        "item": "icon-badge"
+      }
+    },
+    "tags": ["横向", "图标", "徽章", "导航"],
+    "sort_order": 73,
+    "is_active": true
+  },
+  {
+    "id": "sequence-steps-numbered",
+    "name": "编号步骤流程",
+    "category": "sequence",
+    "structure_type": "sequence-steps",
+    "description": "带编号的简单步骤流程,清晰明了",
+    "keywords": "步骤,编号,流程,简单",
+    "use_cases": "操作指南、教程步骤、安装流程",
+    "preview_url": "",
+    "data_schema": {
+      "description": "顺序流程数据",
+      "dataFields": {
+        "title": {"type": "string", "required": false, "description": "标题"},
+        "desc": {"type": "string", "required": false, "description": "描述"},
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "流程步骤列表",
+          "itemSchema": {
+            "label": {"type": "string", "required": true, "description": "步骤名称"},
+            "desc": {"type": "string", "required": false, "description": "步骤描述"}
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {"type": "sequence-steps"},
+        "title": "default",
+        "item": "indexed-card"
+      }
+    },
+    "tags": ["步骤", "编号", "流程", "教程"],
+    "sort_order": 87,
+    "is_active": true
+  },
+  {
+    "id": "sequence-timeline-milestone",
+    "name": "里程碑时间轴",
+    "category": "sequence",
+    "structure_type": "sequence-timeline",
+    "description": "时间轴配合里程碑标记,展示重要事件",
+    "keywords": "时间轴,里程碑,事件,历史",
+    "use_cases": "项目里程碑、公司发展史、产品迭代、重大事件",
+    "preview_url": "",
+    "data_schema": {
+      "description": "顺序流程数据",
+      "dataFields": {
+        "title": {"type": "string", "required": false, "description": "标题"},
+        "desc": {"type": "string", "required": false, "description": "描述"},
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "流程步骤列表",
+          "itemSchema": {
+            "label": {"type": "string", "required": true, "description": "步骤名称"},
+            "desc": {"type": "string", "required": false, "description": "步骤描述"},
+            "time": {"type": "string", "required": false, "description": "时间点"}
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {"type": "sequence-timeline"},
+        "title": "default",
+        "item": "milestone-card"
+      }
+    },
+    "tags": ["时间轴", "里程碑", "历史", "事件"],
+    "sort_order": 90,
+    "is_active": true
+  },
+  {
+    "id": "list-pyramid-badge",
+    "name": "金字塔徽章层级",
+    "category": "hierarchy",
+    "structure_type": "list-pyramid",
+    "description": "金字塔布局配合徽章样式,展示优先级",
+    "keywords": "金字塔,徽章,层级,优先级",
+    "use_cases": "需求优先级、马斯洛需求层次、组织层级",
+    "preview_url": "",
+    "data_schema": {
+      "description": "简单列表数据",
+      "dataFields": {
+        "title": {"type": "string", "required": false, "description": "标题"},
+        "desc": {"type": "string", "required": false, "description": "描述"},
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "数据项列表",
+          "itemSchema": {
+            "label": {"type": "string", "required": true, "description": "项目标题"},
+            "desc": {"type": "string", "required": false, "description": "项目描述"}
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {"type": "list-pyramid"},
+        "title": "default",
+        "item": "badge"
+      }
+    },
+    "tags": ["金字塔", "徽章", "层级", "优先级"],
+    "sort_order": 69,
+    "is_active": true
+  },
+  {
+    "id": "sequence-circular-icon",
+    "name": "图标环形流程",
+    "category": "sequence",
+    "structure_type": "sequence-circular",
+    "description": "环形流程配合图标,视觉更丰富",
+    "keywords": "环形,循环,图标,流程",
+    "use_cases": "产品循环、业务闭环、生态系统",
+    "preview_url": "",
+    "data_schema": {
+      "description": "顺序流程数据",
+      "dataFields": {
+        "title": {"type": "string", "required": false, "description": "标题"},
+        "desc": {"type": "string", "required": false, "description": "描述"},
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "流程步骤列表",
+          "itemSchema": {
+            "label": {"type": "string", "required": true, "description": "步骤名称"},
+            "desc": {"type": "string", "required": false, "description": "步骤描述"},
+            "icon": {"type": "string", "required": false, "description": "图标"}
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {"type": "sequence-circular"},
+        "title": "default",
+        "item": "icon-card"
+      }
+    },
+    "tags": ["环形", "图标", "循环", "流程"],
+    "sort_order": 94,
+    "is_active": true
+  },
+  {
+    "id": "relation-circle-connected",
+    "name": "连线圆形关系图",
+    "category": "relation",
+    "structure_type": "relation-circle",
+    "description": "圆形关系图配合连线,展示复杂关联",
+    "keywords": "圆形,关系,连线,关联",
+    "use_cases": "业务关联、系统依赖、生态关系",
+    "preview_url": "",
+    "data_schema": {
+      "description": "关系网络数据",
+      "dataFields": {
+        "title": {"type": "string", "required": false, "description": "标题"},
+        "center": {"type": "string", "required": true, "description": "中心节点"},
+        "nodes": {
+          "type": "array",
+          "required": true,
+          "description": "节点列表",
+          "itemSchema": {
+            "label": {"type": "string", "required": true, "description": "节点名称"},
+            "desc": {"type": "string", "required": false, "description": "节点描述"}
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {"type": "relation-circle"},
+        "title": "default",
+        "item": "connected-card"
+      }
+    },
+    "tags": ["圆形", "关系", "连线", "网络"],
+    "sort_order": 67,
+    "is_active": true
+  },
+  {
+    "id": "list-sector-numbered",
+    "name": "编号扇形列表",
+    "category": "list",
+    "structure_type": "list-sector",
+    "description": "扇形布局配合编号,环形展示要点",
+    "keywords": "扇形,编号,环形,要点",
+    "use_cases": "核心要点、服务项目、关键特性",
+    "preview_url": "",
+    "data_schema": {
+      "description": "简单列表数据",
+      "dataFields": {
+        "title": {"type": "string", "required": false, "description": "标题"},
+        "desc": {"type": "string", "required": false, "description": "描述"},
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "数据项列表",
+          "itemSchema": {
+            "label": {"type": "string", "required": true, "description": "项目标题"},
+            "desc": {"type": "string", "required": false, "description": "项目描述"}
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {"type": "list-sector"},
+        "title": "default",
+        "item": "numbered-badge"
+      }
+    },
+    "tags": ["扇形", "编号", "环形", "列表"],
+    "sort_order": 76,
+    "is_active": true
+  },
+  {
+    "id": "compare-binary-vs-card",
+    "name": "VS对比卡片",
+    "category": "comparison",
+    "structure_type": "compare-binary-horizontal",
+    "description": "带VS标识的二元对比卡片,强调对抗性",
+    "keywords": "对比,VS,卡片,对抗",
+    "use_cases": "产品PK、方案选择、竞品对比",
+    "preview_url": "",
+    "data_schema": {
+      "description": "二元对比数据",
+      "dataFields": {
+        "title": {"type": "string", "required": false, "description": "标题"},
+        "left": {
+          "type": "object",
+          "required": true,
+          "description": "左侧数据",
+          "schema": {
+            "title": {"type": "string", "required": true, "description": "左侧标题"},
+            "items": {"type": "array", "required": true, "description": "左侧项目"}
+          }
+        },
+        "right": {
+          "type": "object",
+          "required": true,
+          "description": "右侧数据",
+          "schema": {
+            "title": {"type": "string", "required": true, "description": "右侧标题"},
+            "items": {"type": "array", "required": true, "description": "右侧项目"}
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {"type": "compare-binary-horizontal"},
+        "title": "default",
+        "item": "vs-card"
+      }
+    },
+    "tags": ["对比", "VS", "卡片", "竞品"],
+    "sort_order": 71,
+    "is_active": true
+  },
+  {
+    "id": "sequence-ascending-steps-icon",
+    "name": "图标上升步骤",
+    "category": "sequence",
+    "structure_type": "sequence-ascending-steps",
+    "description": "上升步骤配合图标,展示进阶路径",
+    "keywords": "上升,步骤,图标,进阶",
+    "use_cases": "学习路径、职业发展、能力提升",
+    "preview_url": "",
+    "data_schema": {
+      "description": "顺序流程数据",
+      "dataFields": {
+        "title": {"type": "string", "required": false, "description": "标题"},
+        "desc": {"type": "string", "required": false, "description": "描述"},
+        "items": {
+          "type": "array",
+          "required": true,
+          "description": "流程步骤列表",
+          "itemSchema": {
+            "label": {"type": "string", "required": true, "description": "步骤名称"},
+            "desc": {"type": "string", "required": false, "description": "步骤描述"},
+            "icon": {"type": "string", "required": false, "description": "图标"}
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {"type": "sequence-ascending-steps"},
+        "title": "default",
+        "item": "icon-badge"
+      }
+    },
+    "tags": ["上升", "图标", "步骤", "成长"],
+    "sort_order": 93,
+    "is_active": true
+  },
+  {
+    "id": "quadrant-priority-matrix",
+    "name": "优先级矩阵",
+    "category": "quadrant",
+    "structure_type": "quadrant",
+    "description": "四象限优先级矩阵,用于任务分类",
+    "keywords": "四象限,优先级,矩阵,任务",
+    "use_cases": "任务优先级、时间管理、紧急重要矩阵",
+    "preview_url": "",
+    "data_schema": {
+      "description": "2x2矩阵",
+      "dataFields": {
+        "title": {"type": "string", "required": false},
+        "xAxis": {"type": "string", "required": true, "description": "横轴标签"},
+        "yAxis": {"type": "string", "required": true, "description": "纵轴标签"},
+        "quadrants": {
+          "type": "array",
+          "required": true,
+          "description": "四个象限数据",
+          "itemSchema": {
+            "label": {"type": "string", "required": true},
+            "items": {"type": "array", "required": false}
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {"type": "quadrant"},
+        "title": "default",
+        "item": "priority-card"
+      }
+    },
+    "tags": ["四象限", "优先级", "矩阵", "管理"],
+    "sort_order": 49,
+    "is_active": true
+  },
+  {
+    "id": "chart-column-colorful",
+    "name": "彩色柱状图",
+    "category": "chart",
+    "structure_type": "chart-column",
+    "description": "彩色柱状图,每个柱子不同颜色",
+    "keywords": "柱状图,彩色,数据,对比",
+    "use_cases": "多维度数据对比、销售分析、趋势展示",
+    "preview_url": "",
+    "data_schema": {
+      "description": "垂直柱状图",
+      "dataFields": {
+        "title": {"type": "string", "required": false},
+        "data": {
+          "type": "array",
+          "required": true,
+          "itemSchema": {
+            "label": {"type": "string", "required": true, "description": "类别名称"},
+            "value": {"type": "number", "required": true, "description": "数值"}
+          }
+        }
+      }
+    },
+    "design_config": {
+      "design": {
+        "structure": {"type": "chart-column"},
+        "title": "default",
+        "items": [{"type": "colorful", "showIcon": false, "usePaletteColor": true}]
+      }
+    },
+    "tags": ["柱状图", "彩色", "数据", "图表"],
+    "sort_order": 39,
+    "is_active": true
+  }
+]
