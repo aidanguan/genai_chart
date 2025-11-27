@@ -61,13 +61,13 @@ class LLMClient:
                 "temperature": temperature
             }
             
-            # gpt-5.1等思考模型支持reasoning_effort参数，但不支持response_format
-            # 根据AiHubMix官方文档，gpt-5.1需要添加reasoning_effort参数
-            if "gpt-5" in model or "o1" in model or "o3" in model:
+            # 只有 o1/o3 系列推理模型支持reasoning_effort参数
+            # gpt-5.1 和其他模型都不支持此参数
+            if "o1" in model or "o3" in model:
                 kwargs["reasoning_effort"] = reasoning_effort
-                # 思考模型不支持response_format，必须通过prompt引导JSON输出
+                # o1/o3 推理模型不支持response_format，必须通过prompt引导JSON输出
             elif response_format:
-                # 非思考模型才添加response_format
+                # 其他模型添加response_format
                 kwargs["response_format"] = response_format
             
             logger.info(f"准备调用LLM: model={model}, kwargs keys={list(kwargs.keys())}")
@@ -128,13 +128,13 @@ class LLMClient:
                 "temperature": 0.3
             }
             
-            # 思考模型(gpt-5, o1, o3)不支持response_format，通过reasoning_effort控制
-            # 非思考模型使用response_format来确保JSON输出
-            if "gpt-5" not in self.recommend_model and "o1" not in self.recommend_model and "o3" not in self.recommend_model:
+            # 只有 o1/o3 系列推理模型不支持response_format
+            # 其他模型(包括 gpt-5.1)使用response_format来确保JSON输出
+            if "o1" not in self.recommend_model and "o3" not in self.recommend_model:
                 kwargs["response_format"] = {"type": "json_object"}
                 logger.info(f"[recommend_templates] 使用response_format=json_object")
             else:
-                logger.info(f"[recommend_templates] 思考模型，不使用response_format")
+                logger.info(f"[recommend_templates] o1/o3推理模型，不使用response_format")
             
             logger.info(f"[recommend_templates] 调用LLM，kwargs: {list(kwargs.keys())}")
             response = await self.chat_completion(**kwargs)
@@ -186,9 +186,9 @@ class LLMClient:
                 "temperature": 0.2
             }
             
-            # 思考模型(gpt-5, o1, o3)不支持response_format，通过reasoning_effort控制
-            # 非思考模型使用response_format来确保JSON输出
-            if "gpt-5" not in self.extract_model and "o1" not in self.extract_model and "o3" not in self.extract_model:
+            # 只有 o1/o3 系列推理模型不支持response_format
+            # 其他模型(包括 gpt-5.1)使用response_format来确保JSON输出
+            if "o1" not in self.extract_model and "o3" not in self.extract_model:
                 kwargs["response_format"] = {"type": "json_object"}
             
             response = await self.chat_completion(**kwargs)

@@ -10,6 +10,11 @@ const router = createRouter({
       path: '/',
       name: 'workspace',
       component: () => import('@/views/AIWorkspace/AIWorkspace.vue')
+    },
+    {
+      path: '/examples',
+      name: 'examples',
+      component: () => import('@/views/Examples/Examples.vue')
     }
   ]
 })

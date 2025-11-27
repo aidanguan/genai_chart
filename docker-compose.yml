@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  # 后端服务
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: genai-chart-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - ./backend/data:/app/data
+      - ./backend/temp:/app/temp
+    environment:
+      # LLM API 配置
+      - AIHUBMIX_API_KEY=${AIHUBMIX_API_KEY}
+      - AIHUBMIX_BASE_URL=${AIHUBMIX_BASE_URL:-https://aihubmix.com/v1}
+      - LLM_MODEL=${LLM_MODEL:-gpt-4o}
+      
+      # Dify 工作流配置（可选）
+      - DIFY_API_KEY=${DIFY_API_KEY}
+      - DIFY_BASE_URL=${DIFY_BASE_URL}
+      
+      # 数据库配置
+      - DATABASE_URL=sqlite:///./data/genai_chart.db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # 前端服务
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: genai-chart-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  backend-data:
+  backend-temp:

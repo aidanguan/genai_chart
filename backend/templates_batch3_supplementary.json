@@ -508,7 +508,7 @@
       "design": {
         "structure": {"type": "chart-column"},
         "title": "default",
-        "items": [{"type": "colorful", "showIcon": false, "usePaletteColor": true}]
+        "items": [{"type": "simple", "showIcon": false, "usePaletteColor": true}]
       }
     },
     "tags": ["柱状图", "彩色", "数据", "图表"],

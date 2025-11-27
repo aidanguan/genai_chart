@@ -10,7 +10,7 @@ import os
 from app.services.export_service import get_export_service, SUPPORTED_FORMATS
 from app.schemas.common import APIResponse
 
-router = APIRouter(prefix="/export", tags=["导出"])
+router = APIRouter(tags=["导出"])
 
 
 class ExportRequest(BaseModel):
@@ -48,14 +48,21 @@ async def export_infographic(request: ExportRequest):
     - **height**: 高度(仅用于PNG格式)
     - **scale**: 缩放比例(仅用于PNG格式)
     """
+    import logging
+    logger = logging.getLogger(__name__)
+    
     try:
+        logger.info(f"开始导出, 格式: {request.format}, SVG长度: {len(request.svgContent)}")
+        
         export_service = get_export_service()
         
         # 验证格式
         if request.format not in SUPPORTED_FORMATS:
+            error_msg = f"不支持的导出格式: {request.format}"
+            logger.error(error_msg)
             return APIResponse(
                 success=False,
-                error=f"不支持的导出格式: {request.format}"
+                error=error_msg
             )
         
         # 准备导出参数
@@ -72,12 +79,16 @@ async def export_infographic(request: ExportRequest):
         elif request.format == "pptx":
             export_kwargs["title"] = request.title
         
+        logger.info(f"导出参数: {export_kwargs}")
+        
         # 执行导出
         result = export_service.export(
             svg_content=request.svgContent,
             format=request.format,
             **export_kwargs
         )
+        
+        logger.info(f"导出成功: {result}")
         
         # 构建下载URL
         download_url = f"/api/v1/export/download/{result['filename']}"
@@ -95,14 +106,18 @@ async def export_infographic(request: ExportRequest):
         return APIResponse(success=True, data=response_data)
         
     except ImportError as e:
+        error_msg = f"缺少必要的依赖库: {str(e)}"
+        logger.error(error_msg, exc_info=True)
         return APIResponse(
             success=False,
-            error=f"缺少必要的依赖库: {str(e)}"
+            error=error_msg
         )
     except Exception as e:
+        error_msg = f"导出失败: {str(e)}"
+        logger.error(error_msg, exc_info=True)
         return APIResponse(
             success=False,
-            error=f"导出失败: {str(e)}"
+            error=error_msg
         )
 
 

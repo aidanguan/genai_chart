@@ -342,6 +342,10 @@ class GenerateService:
             template_schema=template_schema
         )
         
+        # 如果是组织架构树,需要将数据转换为树形结构
+        if template_id == 'org-tree':
+            extracted_data = self._convert_to_tree_data(extracted_data)
+        
         # 获取AntV模板配置映射
         from app.services.template_service import TEMPLATE_DESIGN_MAP
         template_design = TEMPLATE_DESIGN_MAP.get(template_id)
@@ -394,6 +398,58 @@ class GenerateService:
         
         # 如果没有找到需要转换的情况，返回原配置
         return template_design
+    
+    def _convert_to_tree_data(self, extracted_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        将扫平的items数组转换为树形结构
+        
+        Args:
+            extracted_data: 原始提取数据，包含 items 数组
+        
+        Returns:
+            Dict: 转换为树形结构的数据
+        """
+        data = extracted_data.get('data', {})
+        items = data.get('items', [])
+        
+        if not items:
+            return extracted_data
+        
+        # 简单的层级关系转换：将第一个作为根节点，其余作为子节点
+        # 更复杂的层级关系需要更高级的解析
+        root_item = items[0]
+        children_items = items[1:] if len(items) > 1 else []
+        
+        # 转换子节点 - 使用 label 和 desc 字段（AntV Infographic 标准字段）
+        children = []
+        for item in children_items:
+            child_node = {
+                "label": item.get('label', ''),
+                "desc": item.get('desc', ''),
+            }
+            # 如果有icon，保留
+            if 'icon' in item:
+                child_node['icon'] = item['icon']
+            children.append(child_node)
+        
+        # 构建树形结构 - 使用 label 和 desc 字段
+        tree_data = {
+            "title": data.get('title', ''),
+            "desc": data.get('desc', ''),
+            "items": [
+                {
+                    "label": root_item.get('label', ''),
+                    "desc": root_item.get('desc', ''),
+                    "icon": root_item.get('icon'),
+                    "children": children
+                }
+            ]
+        }
+        
+        return {
+            "data": tree_data,
+            "themeConfig": extracted_data.get('themeConfig', {})
+        }
 
 
 # 全局生成服务实例

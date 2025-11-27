@@ -87,18 +87,34 @@ async function handleAnalyze() {
   try {
     workspaceStore.setAnalyzing(true)
     
-    // 调用AI推荐
-    const result = await templateStore.fetchRecommendations(inputText.value)
+    // 调用智能生成API（三阶段流程）
+    const generateModule = await import('@/api/generate')
+    const response = await generateModule.generateAPI.smartGenerate(inputText.value)
     
-    if (result && result.recommendations && result.recommendations.length > 0) {
-      message.success(`分析完成！为您推荐了 ${result.recommendations.length} 个模板`)
+    console.log('[LeftInputPanel] 智能生成响应:', response)
+    
+    if (response.success && response.data) {
+      const { config, classification, selection } = response.data
       
-      // 自动选择第一个推荐的模板
-      const firstTemplate = result.recommendations[0]
-      workspaceStore.setSelectedTemplate(firstTemplate.templateId)
+      console.log('[LeftInputPanel] 分类:', classification)
+      console.log('[LeftInputPanel] 选择:', selection)
+      console.log('[LeftInputPanel] 配置:', config)
       
-      // 自动生成信息图
-      await handleGenerate(firstTemplate.templateId)
+      // 构建推荐列表（只包含选中的模板）
+      const recommendations = [{
+        templateId: selection.templateId,
+        templateName: selection.templateName,
+        confidence: selection.confidence,
+        matchScore: Math.round(selection.confidence * 100),
+        reason: selection.reason
+      }]
+      
+      // 更新store
+      templateStore.recommendations = recommendations
+      workspaceStore.setSelectedTemplate(selection.templateId)
+      workspaceStore.setConfig(config)
+      
+      message.success(`分析完成！识别为${classification.type}类型，推荐使用${selection.templateName}`)
     } else {
       message.warning('未找到合适的模板，请尝试调整输入内容')
     }

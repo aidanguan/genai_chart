@@ -87,7 +87,7 @@ TEMPLATE_DESIGN_MAP = {
     },
     "org-tree": {
         "design": {
-            "structure": {"type": "tree-org"},
+            "structure": {"type": "hierarchy-tree"},
             "title": "default",
             "item": "badge-card"  # 组织树使用badge-card
         }

@@ -3,12 +3,24 @@
     <div class="header-content">
       <!-- Logo 区域 -->
       <div class="header-left">
-        <div class="logo-icon">
-          <Hexagon :size="20" fill="currentColor" />
-        </div>
-        <span class="logo-text">
-          图表<span class="logo-highlight">生成器</span>
-        </span>
+        <router-link to="/" class="logo-link">
+          <div class="logo-icon">
+            <Hexagon :size="20" fill="currentColor" />
+          </div>
+          <span class="logo-text">
+            图表<span class="logo-highlight">生成器</span>
+          </span>
+        </router-link>
+        
+        <!-- 导航菜单 -->
+        <nav class="nav-menu">
+          <router-link to="/" class="nav-item" active-class="nav-item-active">
+            首页
+          </router-link>
+          <router-link to="/examples" class="nav-item" active-class="nav-item-active">
+            示例
+          </router-link>
+        </nav>
       </div>
       
       <!-- 用户信息区域 -->
@@ -123,7 +135,15 @@ onUnmounted(() => {
 .header-left {
   display: flex;
   align-items: center;
+  gap: 2rem;
+}
+
+.logo-link {
+  display: flex;
+  align-items: center;
   gap: 8px;
+  text-decoration: none;
+  color: inherit;
 }
 
 .logo-icon {
@@ -146,6 +166,32 @@ onUnmounted(() => {
 
 .logo-highlight {
   color: #8b5cf6;
+}
+
+.nav-menu {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.nav-item {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+  
+  &:hover {
+    color: #3b82f6;
+    background: #f3f4f6;
+  }
+}
+
+.nav-item-active {
+  color: #3b82f6;
+  background: #eff6ff;
 }
 
 .header-right {

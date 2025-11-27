@@ -34,11 +34,30 @@
           </div>
         </div>
         
-        <!-- 导出按钮 -->
-        <button class="action-btn" @click="handleExportClick">
-          <Download :size="14" />
-          <span class="btn-text">导出</span>
-        </button>
+        <!-- 导出按钮（下拉菜单） -->
+        <div class="export-dropdown" ref="exportDropdownRef">
+          <button class="action-btn" @click="toggleExportDropdown">
+            <Download :size="14" />
+            <span class="btn-text">导出</span>
+            <ChevronDown :size="12" :class="['dropdown-arrow', { 'rotated': isExportDropdownOpen }]" />
+          </button>
+          
+          <!-- 导出格式下拉菜单 -->
+          <div v-if="isExportDropdownOpen" class="export-dropdown-menu">
+            <button class="export-item" @click="handleExport({ key: 'png' })">
+              <span>🖼️ PNG 图片</span>
+              <span class="export-desc">高清位图</span>
+            </button>
+            <button class="export-item" @click="handleExport({ key: 'svg' })">
+              <span>🎨 SVG 矢量图</span>
+              <span class="export-desc">可无限缩放</span>
+            </button>
+            <button class="export-item" @click="handleExport({ key: 'pptx' })">
+              <span>📊 PPTX 演示</span>
+              <span class="export-desc">PowerPoint</span>
+            </button>
+          </div>
+        </div>
         
         <!-- 保存按钮 -->
         <button class="action-btn primary" @click="handleSave">
@@ -143,8 +162,10 @@ const templateStore = useTemplateStore()
 
 const canvasRef = ref<HTMLElement>()
 const dropdownRef = ref<HTMLElement>()
+const exportDropdownRef = ref<HTMLElement>()
 const zoomLevel = ref(1)
 const isDropdownOpen = ref(false)
+const isExportDropdownOpen = ref(false)
 let infographicInstance: any = null // 使用 any 避免类型问题
 
 // 计算属性
@@ -170,6 +191,9 @@ onMounted(() => {
   const handleClickOutside = (event: MouseEvent) => {
     if (dropdownRef.value && !dropdownRef.value.contains(event.target as Node)) {
       isDropdownOpen.value = false
+    }
+    if (exportDropdownRef.value && !exportDropdownRef.value.contains(event.target as Node)) {
+      isExportDropdownOpen.value = false
     }
   }
   
@@ -211,6 +235,10 @@ function toggleDropdown() {
   isDropdownOpen.value = !isDropdownOpen.value
 }
 
+function toggleExportDropdown() {
+  isExportDropdownOpen.value = !isExportDropdownOpen.value
+}
+
 async function handleTemplateSelect(templateId: string) {
   if (templateId === selectedTemplateId.value) {
     isDropdownOpen.value = false
@@ -238,11 +266,6 @@ async function handleTemplateSelect(templateId: string) {
   } finally {
     workspaceStore.setGenerating(false)
   }
-}
-
-function handleExportClick() {
-  // 目前直接导出PNG
-  handleExport({ key: 'png' })
 }
 
 function renderInfographic(cfg: any) {
@@ -313,45 +336,105 @@ async function handleTemplateChange(templateId: string) {
   }
 }
 
+function handleExportClick() {
+  // 目前直接导出PNG
+  handleExport({ key: 'png' })
+}
+
 async function handleExport({ key }: { key: string }) {
   try {
+    // 关闭下拉菜单
+    isExportDropdownOpen.value = false
+    
     message.loading(`正在导出${key.toUpperCase()}...`, 0)
     
-    // 获取SVG内容
-    const svgElement = canvasRef.value?.querySelector('svg')
-    if (!svgElement) {
+    // 检查是否有渲染实例
+    if (!infographicInstance) {
       message.destroy()
       message.warning('请先生成信息图')
       return
     }
     
-    const svgContent = new XMLSerializer().serializeToString(svgElement)
-    
-    // 调用导出API
-    const { exportInfographic, getDownloadUrl } = await import('@/api/export')
-    const response = await exportInfographic({
-      svgContent,
-      format: key as 'svg' | 'png' | 'pdf' | 'pptx',
-      filename: `infographic_${Date.now()}.${key}`,
-      title: '信息图',
-      width: 1200,
-      height: 800,
-      scale: 2
-    })
-    
-    if (response.success && response.data) {
-      message.destroy()
-      
-      // 下载文件
-      const downloadUrl = getDownloadUrl(response.data.filename)
-      const link = document.createElement('a')
-      link.href = downloadUrl
-      link.download = response.data.filename
-      link.click()
-      
-      message.success(`${key.toUpperCase()}导出成功`)
+    // PNG 和 SVG 使用前端直接导出
+    if (key === 'png' || key === 'svg') {
+      try {
+        const dataURL = await infographicInstance.toDataURL({
+          type: key as 'png' | 'svg',
+          dpr: 2  // 高清输出
+        })
+        
+        // 下载文件
+        const link = document.createElement('a')
+        link.href = dataURL
+        link.download = `infographic_${Date.now()}.${key}`
+        link.click()
+        
+        message.destroy()
+        message.success(`${key.toUpperCase()}导出成功`)
+      } catch (error: any) {
+        message.destroy()
+        message.error(`导出失败: ${error.message || '未知错误'}`)
+      }
+      return
     }
+    
+    // PPTX 需要调用后端API
+    if (key === 'pptx') {
+      const svgElement = canvasRef.value?.querySelector('svg')
+      if (!svgElement) {
+        message.destroy()
+        message.warning('请先生成信息图')
+        return
+      }
+      
+      console.log('开始导出PPTX...')
+      const svgContent = new XMLSerializer().serializeToString(svgElement)
+      console.log('SVG内容长度:', svgContent.length)
+      
+      try {
+        // 调用导出API
+        const { exportInfographic, getDownloadUrl } = await import('@/api/export')
+        console.log('调用后端导出API...')
+        
+        const response = await exportInfographic({
+          svgContent,
+          format: 'pptx',
+          filename: `infographic_${Date.now()}.pptx`,
+          title: '信息图'
+        })
+        
+        console.log('导出响应:', response)
+        
+        if (response.success && response.data) {
+          message.destroy()
+          
+          // 下载文件
+          const downloadUrl = getDownloadUrl(response.data.filename)
+          console.log('下载URL:', downloadUrl)
+          
+          const link = document.createElement('a')
+          link.href = downloadUrl
+          link.download = response.data.filename
+          link.click()
+          
+          message.success('PPTX导出成功')
+        } else {
+          message.destroy()
+          message.error(response.error || '导出失败')
+        }
+      } catch (apiError: any) {
+        console.error('导出API调用失败:', apiError)
+        message.destroy()
+        const errorMsg = apiError.response?.data?.error || apiError.message || '导出失败'
+        message.error(`导出失败: ${errorMsg}`)
+      }
+      return
+    }
+    
+    message.destroy()
+    message.warning(`暂不支持 ${key.toUpperCase()} 格式`)
   } catch (error: any) {
+    console.error('导出异常:', error)
     message.destroy()
     message.error(error.message || '导出失败')
   }
@@ -583,6 +666,62 @@ onUnmounted(() => {
       background: #2563eb;
       border-color: #2563eb;
     }
+  }
+}
+
+.export-dropdown {
+  position: relative;
+}
+
+.dropdown-arrow {
+  color: #6b7280;
+  transition: transform 0.2s;
+  
+  &.rotated {
+    transform: rotate(180deg);
+  }
+}
+
+.export-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 200px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #f0f0f0;
+  overflow: hidden;
+  z-index: 50;
+  animation: fadeIn 0.1s ease-out;
+}
+
+.export-item {
+  width: 100%;
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: #374151;
+  
+  &:hover {
+    background: #f9fafb;
+  }
+  
+  span:first-child {
+    font-weight: 500;
+  }
+  
+  .export-desc {
+    font-size: 11px;
+    color: #9ca3af;
+    font-weight: 400;
   }
 }
 
