@@ -169,11 +169,15 @@ genai_chart-1/
 │   │   ├── api/v1/         # API端点
 │   │   ├── services/       # 业务服务
 │   │   ├── schemas/        # 数据模型
+│   │   ├── models/         # 数据库模型
+│   │   ├── repositories/   # 数据访问层
 │   │   ├── utils/          # 工具函数
-│   │   ├── config.py       # 配置管理
+│   │   ├── config/         # 配置管理
 │   │   └── main.py         # 应用入口
+│   ├── scripts/            # 数据库脚本
 │   ├── requirements.txt    # Python依赖
-│   └── .env.example        # 环境变量示例
+│   ├── .env.example        # 环境变量示例
+│   └── Dockerfile          # Docker配置
 │
 ├── frontend/               # 前端应用
 │   ├── src/
@@ -183,9 +187,32 @@ genai_chart-1/
 │   │   ├── router/        # 路由配置
 │   │   └── App.vue        # 根组件
 │   ├── package.json       # 前端依赖
-│   └── vite.config.ts     # Vite配置
+│   ├── vite.config.ts     # Vite配置
+│   └── Dockerfile         # Docker配置
 │
-└── antv_infographic/      # AntV Infographic库源码
+├── antv_infographic/      # AntV Infographic库源码
+│   └── infographic/       # 核心库
+│
+├── docs/                  # 项目文档
+│   ├── QUICK_START.md              # 快速开始指南
+│   ├── DOCKER_QUICKSTART.md        # Docker快速启动
+│   ├── FINAL_COMPLETION_REPORT.md  # 项目完成报告
+│   ├── SMART_GENERATION_GUIDE.md   # 智能生成指南
+│   ├── TEMPLATE_EXPANSION_GUIDE.md # 模板扩展指南
+│   └── ... 更多文档
+│
+├── tests/                 # 测试文件
+│   ├── backend/          # 后端测试
+│   │   ├── test_*.py    # 各类测试脚本
+│   │   └── check_*.py   # 验证脚本
+│   └── frontend/         # 前端测试
+│
+├── archive/              # 归档文件
+│   ├── temp_files/      # 临时测试文件
+│   └── old_docs/        # 旧文档
+│
+├── docker-compose.yml    # Docker编排配置
+└── README.md            # 项目说明
 ```
 
 ## 核心流程
@@ -235,6 +262,37 @@ genai_chart-1/
 - 查看浏览器控制台错误信息
 
 ## 开发说明
+
+### 项目文档
+
+完整的项目文档位于 `docs/` 目录：
+
+- **快速开始**
+  - `QUICK_START.md` - 5分钟快速启动指南
+  - `DOCKER_QUICKSTART.md` - Docker快速部署
+  
+- **功能指南**
+  - `SMART_GENERATION_GUIDE.md` - 智能生成功能详解
+  - `TEMPLATE_EXPANSION_GUIDE.md` - 模板扩展指南
+  - `PPTX_EXPORT_WINDOWS_GUIDE.md` - Windows导出PPTX配置
+  - `LLM_PROVIDER_CONFIG.md` - LLM提供商配置
+  
+- **项目报告**
+  - `FINAL_COMPLETION_REPORT.md` - 项目完成总结
+  - `PROJECT_STATUS.md` - 项目状态
+  - `TASKS_COMPLETED.md` - 已完成任务清单
+
+### 测试说明
+
+所有测试脚本位于 `tests/` 目录：
+
+- **后端测试** (`tests/backend/`)
+  - `test_smart_generation.py` - 智能生成流程测试
+  - `test_chart_column_simple.py` - 图表模板测试
+  - `test_pyramid_e2e.py` - 金字塔模板端到端测试
+  - `test_dify_integration.py` - Dify工作流集成测试
+  - `test_pptx_chinese.py` - PPTX中文导出测试
+  - `check_*.py` - 各种配置验证脚本
 
 ### 添加新模板
 
