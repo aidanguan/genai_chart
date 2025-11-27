@@ -28,6 +28,12 @@ class Settings(BaseSettings):
     # API配置
     API_PREFIX: str = "/api/v1"
     
+    # Dify工作流配置
+    DIFY_API_BASE_URL: str = "http://dify-uat.42lab.cn/v1"
+    DIFY_API_KEY: str = ""
+    DIFY_API_TIMEOUT: int = 30
+    DIFY_RESPONSE_MODE: str = "blocking"
+    
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"

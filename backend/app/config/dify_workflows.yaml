@@ -1,0 +1,80 @@
+# Dify工作流映射配置
+# 定义模板ID到Dify工作流的映射关系
+
+# chart-column-simple模板配置
+chart-column-simple:
+  # Dify工作流App ID（null表示使用环境变量中的默认DIFY_API_KEY）
+  dify_app_id: null
+  # 工作流名称（用于日志）
+  workflow_name: "chart-column-simple数据生成工作流"
+  # 是否启用该工作流
+  enabled: true
+  # 失败时是否回退到系统LLM
+  fallback_to_system_llm: true
+
+# 其他图表类模板
+bar-chart-vertical:
+  dify_app_id: null
+  workflow_name: "垂直柱状图数据生成工作流"
+  enabled: true
+  fallback_to_system_llm: true
+
+chart-bar-horizontal:
+  dify_app_id: null
+  workflow_name: "横向柱状图数据生成工作流"
+  enabled: true
+  fallback_to_system_llm: true
+
+# 列表类模板
+list-column-simple:
+  dify_app_id: null
+  workflow_name: "简单纵向列表数据生成工作流"
+  enabled: true
+  fallback_to_system_llm: true
+
+list-row-horizontal-icon-arrow:
+  dify_app_id: null
+  workflow_name: "横向流程图数据生成工作流"
+  enabled: true
+  fallback_to_system_llm: true
+
+# 层级类模板
+org-tree:
+  dify_app_id: null
+  workflow_name: "组织架构树数据生成工作流"
+  enabled: true
+  fallback_to_system_llm: true
+
+pyramid-layer:
+  dify_app_id: null
+  workflow_name: "金字塔层级图数据生成工作流"
+  enabled: true
+  fallback_to_system_llm: true
+
+# 关系类模板
+mindmap-radial:
+  dify_app_id: null
+  workflow_name: "放射状思维导图数据生成工作流"
+  enabled: true
+  fallback_to_system_llm: true
+
+# 四象限类模板
+quadrant-swot:
+  dify_app_id: null
+  workflow_name: "SWOT四象限分析数据生成工作流"
+  enabled: true
+  fallback_to_system_llm: true
+
+# 时间线类模板
+timeline-horizontal:
+  dify_app_id: null
+  workflow_name: "横向时间线数据生成工作流"
+  enabled: true
+  fallback_to_system_llm: true
+
+# 对比类模板
+comparison-column:
+  dify_app_id: null
+  workflow_name: "双栏对比数据生成工作流"
+  enabled: true
+  fallback_to_system_llm: true

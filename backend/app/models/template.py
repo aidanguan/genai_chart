@@ -13,8 +13,10 @@ class Template(Base):
     # 字段定义
     id = Column(String(100), primary_key=True, comment="模板唯一标识")
     name = Column(String(200), nullable=False, comment="模板名称(中文)")
-    category = Column(String(50), nullable=False, index=True, comment="分类(7类之一)")
+    category = Column(String(50), nullable=False, index=True, comment="分类(7类之一: chart/comparison/hierarchy/list/quadrant/relationship/sequence)")
+    structure_type = Column(String(100), nullable=True, index=True, comment="AntV structure类型（如list-row、sequence-timeline）")
     description = Column(Text, nullable=True, comment="模板描述")
+    keywords = Column(Text, nullable=True, comment="关键词列表（逗号分隔）")
     use_cases = Column(Text, nullable=True, comment="适用场景说明")
     preview_url = Column(String(500), nullable=True, comment="预览图URL")
     data_schema = Column(JSON, nullable=False, comment="数据结构Schema")
@@ -36,7 +38,9 @@ class Template(Base):
             "id": self.id,
             "name": self.name,
             "category": self.category,
+            "structureType": self.structure_type,
             "description": self.description,
+            "keywords": self.keywords.split(',') if self.keywords else [],
             "useCases": self.use_cases,
             "previewUrl": self.preview_url,
             "dataSchema": self.data_schema,
