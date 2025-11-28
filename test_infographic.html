@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Test Infographic</title>
+  <script src="http://localhost/assets/infographic.js"></script>
+</head>
+<body>
+  <div id="container" style="width: 600px; height: 400px; border: 1px solid #ccc;"></div>
+  
+  <script>
+    // 测试 compare-hierarchy-left-right
+    try {
+      const config1 = {
+        container: document.getElementById('container'),
+        width: 600,
+        height: 400,
+        design: {
+          structure: {
+            type: 'compare-hierarchy-left-right'
+          },
+          title: 'default',
+          items: [
+            { type: 'circle-node', width: 180 },
+            { type: 'plain-text' }
+          ]
+        },
+        data: {
+          title: '测试',
+          items: [
+            {
+              label: '优势',
+              children: [
+                { label: '产品研发强' },
+                { label: '客户粘性高' }
+              ]
+            },
+            {
+              label: '劣势',
+              children: [
+                { label: '品牌曝光弱' },
+                { label: '渠道覆盖窄' }
+              ]
+            }
+          ]
+        }
+      };
+      
+      console.log('Config:', JSON.stringify(config1, null, 2));
+      const infographic = new Infographic(config1);
+      infographic.render();
+      console.log('✓ 渲染成功');
+    } catch (e) {
+      console.error('✗ 渲染失败:', e.message);
+      console.error('Stack:', e.stack);
+    }
+  </script>
+</body>
+</html>
