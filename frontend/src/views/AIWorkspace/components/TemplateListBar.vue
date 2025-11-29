@@ -132,7 +132,7 @@ async function handleTemplateClick(templateId: string) {
 
 <style scoped lang="scss">
 .template-list-bar {
-  width: 120px;
+  width: 156px;
   height: 100%;
   background: #fff;
   border-right: 1px solid #f0f0f0;

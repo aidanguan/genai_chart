@@ -77,7 +77,7 @@ onMounted(() => {
 .input-section {
   min-height: 0;
   height: 100%;
-  width: 30%;      // 输入区占工作区的30%
+  width: 21%;      // 输入区占工作区的21%（从30%减少30%）
   min-width: 360px; // 设置最小宽度，避免过小
   max-width: 600px; // 设置最大宽度，避免过大
   flex-shrink: 0;
