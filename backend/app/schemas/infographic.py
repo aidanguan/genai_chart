@@ -13,6 +13,10 @@ class DataExtractRequest(BaseModel):
         default='system',
         description="LLM提供商: system(系统LLM) 或 dify(Dify工作流)"
     )
+    includeAllTemplates: bool = Field(
+        default=False,
+        description="是否返回所有模板列表（带相似度排序）"
+    )
 
 
 class DataExtractResponse(BaseModel):

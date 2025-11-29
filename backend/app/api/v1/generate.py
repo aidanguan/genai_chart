@@ -18,6 +18,10 @@ router = APIRouter()
 class SmartGenerateRequest(BaseModel):
     """智能生成请求"""
     text: str = Field(..., description="用户输入的文本内容")
+    includeAllTemplates: bool = Field(
+        default=False,
+        description="是否返回所有模板列表（带相似度排序）"
+    )
 
 
 class SmartGenerateResponse(BaseModel):
@@ -48,7 +52,10 @@ async def smart_generate(request: SmartGenerateRequest):
     """
     try:
         generate_service = get_generate_service()
-        result = await generate_service.generate_smart(user_text=request.text)
+        result = await generate_service.generate_smart(
+            user_text=request.text,
+            include_all_templates=request.includeAllTemplates
+        )
         
         return APIResponse(
             success=True,
@@ -73,7 +80,8 @@ async def extract_data(request: DataExtractRequest):
         result = await generate_service.extract_data(
             user_text=request.text,
             template_id=request.templateId,
-            force_provider=request.llmProvider  # 传递用户选择的提供商
+            force_provider=request.llmProvider,
+            include_all_templates=request.includeAllTemplates
         )
         
         return APIResponse(

@@ -5,11 +5,6 @@
     
     <!-- Main Content 主要内容区域 -->
     <main class="workspace-main">
-      <!-- Hero 简介区域 -->
-      <div class="workspace-hero">
-        <WorkspaceHero />
-      </div>
-      
       <!-- Workspace Grid 工作区网格 -->
       <div class="workspace-grid">
         <!-- 左侧输入区 -->
@@ -29,7 +24,6 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import WorkspaceHeader from './components/WorkspaceHeader.vue'
-import WorkspaceHero from './components/WorkspaceHero.vue'
 import LeftInputPanel from './components/LeftInputPanel.vue'
 import RightPreviewPanel from './components/RightPreviewPanel.vue'
 import { useTemplateStore } from '@/stores/template'
@@ -58,69 +52,42 @@ onMounted(() => {
   flex-direction: column;
   min-height: 0;
   width: 100%;
-  max-width: 1600px;
-  margin: 0 auto;
-  padding: 0.75rem;
-  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  gap: 0;
 }
 
 @media (min-width: 768px) {
   .workspace-main {
-    padding: 1rem;
-    gap: 1rem;
+    padding: 0;
+    gap: 0;
   }
-}
-
-.workspace-hero {
-  flex-shrink: 0;
 }
 
 .workspace-grid {
-  flex: 1;
   min-height: 0;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.75rem;
-  height: 100%;
-}
-
-@media (min-width: 1024px) {
-  .workspace-grid {
-    grid-template-columns: repeat(12, 1fr);
-    gap: 0.75rem;
-  }
-  
-  .input-section {
-    grid-column: span 4;
-  }
-  
-  .preview-section {
-    grid-column: span 8;
-  }
-}
-
-@media (min-width: 1280px) {
-  .workspace-grid {
-    gap: 1rem;
-  }
-  
-  .input-section {
-    grid-column: span 3;
-  }
-  
-  .preview-section {
-    grid-column: span 9;
-  }
+  display: flex;
+  gap: 1.5rem;
+  height: 98%;      // 上下各留1%的边距
+  width: 90%;       // 使用浏览器的90%宽度
+  margin: 1% auto;  // 上下1%边距，左右居中
+  padding: 0 1.5rem;
 }
 
 .input-section {
   min-height: 0;
   height: 100%;
+  width: 30%;      // 输入区占工作区的30%
+  min-width: 360px; // 设置最小宽度，避免过小
+  max-width: 600px; // 设置最大宽度，避免过大
+  flex-shrink: 0;
 }
 
 .preview-section {
   min-height: 0;
   height: 100%;
+  flex: 1;
+  min-width: 0;
 }
 
 /* 响应式设计 */

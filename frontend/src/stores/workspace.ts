@@ -4,6 +4,14 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
+export interface TemplateWithSimilarity {
+  templateId: string
+  templateName: string
+  category: string
+  similarityScore: number
+  reason: string
+}
+
 export interface InfographicConfig {
   template?: string
   design?: any
@@ -18,6 +26,11 @@ export const useWorkspaceStore = defineStore('workspace', () => {
   const infographicConfig = ref<InfographicConfig | null>(null)
   const isAnalyzing = ref(false)
   const isGenerating = ref(false)
+  
+  // 新增状态：生成模式、模板列表、缓存
+  const generationMode = ref<'smart' | 'manual'>('smart')
+  const allTemplates = ref<TemplateWithSimilarity[]>([])
+  const templateCache = ref<Map<string, InfographicConfig>>(new Map())
   
   // 计算属性
   const hasInput = computed(() => inputText.value.trim().length > 0)
@@ -50,6 +63,26 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     infographicConfig.value = null
     isAnalyzing.value = false
     isGenerating.value = false
+    generationMode.value = 'smart'
+    allTemplates.value = []
+    templateCache.value.clear()
+  }
+  
+  // 新增方法
+  function setGenerationMode(mode: 'smart' | 'manual') {
+    generationMode.value = mode
+  }
+  
+  function setAllTemplates(templates: TemplateWithSimilarity[]) {
+    allTemplates.value = templates
+  }
+  
+  function cacheTemplateConfig(templateId: string, config: InfographicConfig) {
+    templateCache.value.set(templateId, config)
+  }
+  
+  function getCachedConfig(templateId: string): InfographicConfig | undefined {
+    return templateCache.value.get(templateId)
   }
   
   return {
@@ -59,6 +92,9 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     infographicConfig,
     isAnalyzing,
     isGenerating,
+    generationMode,
+    allTemplates,
+    templateCache,
     // 计算属性
     hasInput,
     hasConfig,
@@ -68,6 +104,10 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     setConfig,
     setAnalyzing,
     setGenerating,
+    setGenerationMode,
+    setAllTemplates,
+    cacheTemplateConfig,
+    getCachedConfig,
     reset
   }
 })

@@ -8,32 +8,6 @@
       </div>
       
       <div class="header-right" v-if="hasConfig">
-        <!-- 模板选择器 -->
-        <div class="template-selector" ref="dropdownRef">
-          <button 
-            class="selector-btn"
-            @click="toggleDropdown"
-          >
-            <span class="selector-label">信息图类型:</span>
-            <span class="selector-value">{{ currentTemplateName }}</span>
-            <ChevronDown :size="14" :class="['selector-arrow', { 'rotated': isDropdownOpen }]" />
-          </button>
-          
-          <!-- 下拉菜单 -->
-          <div v-if="isDropdownOpen" class="dropdown-menu">
-            <button
-              v-for="rec in recommendations"
-              :key="rec.templateId"
-              class="dropdown-item"
-              :class="{ 'active': selectedTemplateId === rec.templateId }"
-              @click="handleTemplateSelect(rec.templateId)"
-            >
-              {{ rec.templateName }}
-              <Check v-if="selectedTemplateId === rec.templateId" :size="14" />
-            </button>
-          </div>
-        </div>
-        
         <!-- 导出按钮（下拉菜单） -->
         <div class="export-dropdown" ref="exportDropdownRef">
           <button class="action-btn" @click="toggleExportDropdown">
@@ -69,43 +43,52 @@
 
     <!-- 画布区域 -->
     <div class="panel-body">
-      <!-- 空状态 -->
-      <div v-if="!hasConfig" class="empty-state">
-        <div class="empty-icon">
-          <Maximize :size="32" />
-        </div>
-        <p class="empty-text">在左侧输入内容并点击分析<br/>即可生成预览</p>
-      </div>
-      
-      <!-- 加载状态 -->
-      <div v-else-if="isGenerating" class="loading-state">
-        <div class="loading-spinner"></div>
-        <p class="loading-text">正在生成信息图...</p>
-      </div>
-      
-      <!-- 画布内容 -->
-      <div v-else class="canvas-wrapper">
-        <div 
-          class="canvas-content"
-          :style="{ transform: `scale(${zoomLevel})` }"
-        >
-          <div ref="canvasRef" class="canvas" id="infographic-canvas"></div>
-        </div>
+      <!-- 主要内容区域 -->
+      <div class="body-content">
+        <!-- 左侧模板列表边栏 -->
+        <TemplateListBar />
         
-        <!-- 缩放控制 -->
-        <div class="zoom-controls">
-          <button class="zoom-btn" @click="handleZoomOut" title="缩小">
-            <ZoomOut :size="16" />
-          </button>
-          <div class="zoom-divider"></div>
-          <button class="zoom-btn fit" @click="handleZoomReset" title="适应">
-            <Maximize :size="12" />
-            <span>适应</span>
-          </button>
-          <div class="zoom-divider"></div>
-          <button class="zoom-btn" @click="handleZoomIn" title="放大">
-            <ZoomIn :size="16" />
-          </button>
+        <!-- 右侧画布区域 -->
+        <div class="canvas-area">
+          <!-- 空状态 -->
+          <div v-if="!hasConfig" class="empty-state">
+            <div class="empty-icon">
+              <Maximize :size="32" />
+            </div>
+            <p class="empty-text">在左侧输入内容并点击分析<br/>即可生成预览</p>
+          </div>
+          
+          <!-- 加载状态 -->
+          <div v-else-if="isGenerating" class="loading-state">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">正在生成信息图...</p>
+          </div>
+          
+          <!-- 画布内容 -->
+          <div v-else class="canvas-wrapper">
+            <div 
+              class="canvas-content"
+              :style="{ transform: `scale(${zoomLevel})` }"
+            >
+              <div ref="canvasRef" class="canvas" id="infographic-canvas"></div>
+            </div>
+            
+            <!-- 缩放控制 -->
+            <div class="zoom-controls">
+              <button class="zoom-btn" @click="handleZoomOut" title="缩小">
+                <ZoomOut :size="16" />
+              </button>
+              <div class="zoom-divider"></div>
+              <button class="zoom-btn fit" @click="handleZoomReset" title="适应">
+                <Maximize :size="12" />
+                <span>适应</span>
+              </button>
+              <div class="zoom-divider"></div>
+              <button class="zoom-btn" @click="handleZoomIn" title="放大">
+                <ZoomIn :size="16" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -128,6 +111,7 @@ import { message } from 'ant-design-vue'
 import { useWorkspaceStore } from '@/stores/workspace'
 import { useTemplateStore } from '@/stores/template'
 import { Infographic, registerResourceLoader, loadSVGResource } from '@antv/infographic'
+import TemplateListBar from './TemplateListBar.vue'
 
 // 注册资源加载器,用于加载图标
 registerResourceLoader(async (config) => {
@@ -509,7 +493,7 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
+  padding: 4px 8px;
   background: #fff;
   border-bottom: 1px solid #f0f0f0;
   flex-shrink: 0;
@@ -737,11 +721,28 @@ onUnmounted(() => {
   min-height: 0;
   overflow: hidden;
   background: #f9fafb;
+  display: flex;
+}
+
+.body-content {
+  flex: 1;
+  display: flex;
+  gap: 0;
+  min-height: 0;
+  margin: 0;
+}
+
+.canvas-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .empty-state,
 .loading-state {
-  height: 100%;
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -790,8 +791,8 @@ onUnmounted(() => {
 }
 
 .canvas-wrapper {
-  height: 100%;
-  padding: 12px;
+  flex: 1;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -804,8 +805,8 @@ onUnmounted(() => {
   transform-origin: center;
   background: #fff;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
-  padding: 32px 48px;
+  border-radius: 6px;
+  padding: 4px 6px;
   max-width: 100%;
   max-height: 100%;
 }

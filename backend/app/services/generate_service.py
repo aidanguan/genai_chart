@@ -14,6 +14,7 @@ from app.services.dify_workflow_client import get_dify_workflow_client
 from app.services.workflow_mapper import get_workflow_mapper
 from app.services.data_validator import get_data_validator
 from app.services.config_assembler import get_config_assembler
+from app.services.similarity_service import get_similarity_service
 
 logger = logging.getLogger(__name__)
 
@@ -43,10 +44,12 @@ class GenerateService:
         self.workflow_mapper = get_workflow_mapper()
         self.data_validator = get_data_validator()
         self.config_assembler = get_config_assembler()
+        self.similarity_service = get_similarity_service()
     
     async def generate_smart(
         self,
-        user_text: str
+        user_text: str,
+        include_all_templates: bool = False
     ) -> Dict[str, Any]:
         """
         智能生成流程（三阶段）
@@ -56,9 +59,10 @@ class GenerateService:
         
         Args:
             user_text: 用户输入的文本
+            include_all_templates: 是否返回所有模板列表（带相似度排序）
         
         Returns:
-            Dict: 包含配置对象、分类信息、模板信息和时间统计
+            Dict: 包含配置对象、分类信息、模板信息、时间统计和allTemplates（可选）
         """
         start_time = time.time()
         
@@ -115,6 +119,21 @@ class GenerateService:
                 result['workflow_info'] = extraction_result['workflow_info']
                 result['timing']['dify_call_time'] = extraction_result.get('dify_call_time', 0)
             
+            # 如果需要返回所有模板列表
+            if include_all_templates:
+                all_templates_result = self.template_service.get_all_templates(page=1, page_size=100)
+                all_templates = all_templates_result.get("templates", [])
+                
+                # 计算相似度并排序
+                templates_with_similarity = self.similarity_service.calculate_all_templates_similarity(
+                    user_text=user_text,
+                    templates=all_templates,
+                    content_type=content_type,
+                    selected_template_id=template_id
+                )
+                
+                result['allTemplates'] = templates_with_similarity
+            
             return result
             
         except Exception as e:
@@ -160,7 +179,8 @@ class GenerateService:
         self,
         user_text: str,
         template_id: str,
-        force_provider: Optional[str] = None
+        force_provider: Optional[str] = None,
+        include_all_templates: bool = False
     ) -> Dict[str, Any]:
         """
         提取结构化数据
@@ -170,13 +190,16 @@ class GenerateService:
             user_text: 用户输入的文本
             template_id: 模板ID
             force_provider: 强制使用的提供商 ('system' 或 'dify')，None表示自动选择
+            include_all_templates: 是否返回所有模板列表（带相似度排序）
         
         Returns:
             Dict: {
                 "config": 完整配置对象,
                 "extractionTime": 提取耗时,
                 "generation_method": "dify_workflow" 或 "system_llm",
-                "workflow_info": {...}  # 如果使用Dify
+                "workflow_info": {...},  # 如果使用Dify
+                "selectedTemplate": {...},  # 选中的模板信息
+                "allTemplates": [...]  # 所有模板列表（可选）
             }
         """
         start_time = time.time()
@@ -254,6 +277,29 @@ class GenerateService:
         
         extraction_time = round(time.time() - start_time, 2)
         result['extractionTime'] = extraction_time
+        
+        # 添加选中的模板信息
+        result['selectedTemplate'] = {
+            "templateId": template_id,
+            "templateName": template.get('name', ''),
+            "category": template.get('category', '')
+        }
+        
+        # 如果需要返回所有模板列表
+        if include_all_templates:
+            all_templates_result = self.template_service.get_all_templates(page=1, page_size=100)
+            all_templates = all_templates_result.get("templates", [])
+            
+            # 计算相似度并排序
+            templates_with_similarity = self.similarity_service.calculate_all_templates_similarity(
+                user_text=user_text,
+                templates=all_templates,
+                content_type=None,  # 手工选择模式下没有类型识别
+                selected_template_id=template_id
+            )
+            
+            result['allTemplates'] = templates_with_similarity
+        
         return result
     
     async def _extract_data_with_dify(

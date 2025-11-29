@@ -25,43 +25,59 @@
         :maxlength="5000"
       />
       
-      <!-- 浮动操作按钮 -->
+      <!-- 浮动操作按钮组 -->
       <div class="action-container">
         <button
-          class="analyze-btn"
-          @click="handleAnalyze"
+          class="mode-btn smart-btn"
+          @click="handleSmartGenerate"
           :disabled="isAnalyzing || !hasValidInput"
         >
           <template v-if="isAnalyzing">
             <div class="loading-spinner"></div>
-            <span>分析中...</span>
+            <span>生成中...</span>
           </template>
           <template v-else>
             <Sparkles :size="18" />
-            <span>分析并推荐模版</span>
+            <span>智能生成</span>
           </template>
+        </button>
+        
+        <button
+          class="mode-btn manual-btn"
+          @click="handleManualSelect"
+          :disabled="isAnalyzing || !hasValidInput"
+        >
+          <FileStack :size="18" />
+          <span>手工选择</span>
         </button>
       </div>
     </div>
+    
+    <!-- 模板选择弹窗 -->
+    <TemplateSelectionModal v-model="showTemplateModal" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { FileText, Sparkles, Eraser } from 'lucide-vue-next'
+import { computed, ref } from 'vue'
+import { FileText, Sparkles, Eraser, FileStack } from 'lucide-vue-next'
 import { message } from 'ant-design-vue'
 import { useWorkspaceStore } from '@/stores/workspace'
 import { useTemplateStore } from '@/stores/template'
 import { useSettingsStore } from '@/stores/settings'
+import TemplateSelectionModal from './TemplateSelectionModal.vue'
 
 const workspaceStore = useWorkspaceStore()
 const templateStore = useTemplateStore()
 const settingsStore = useSettingsStore()
 
+// 显示模板选择弹窗
+const showTemplateModal = ref(false)
+
 const placeholder = `输入您想要的可视化内容,可以是步骤说明、对比分析、组织架构等。AI会自动分析并推荐最合适的信息图模板。
 
 例如:
-这里有一个四个阶段的产品开发流程。第一阶段是概念验证,通过率 10%;第二阶段是原型开发,通过率 30%;第三阶段是市场测试...`
+这里有一个四个阶段的产品开发流程。第一阶段是概念验证,通过率10%;第二阶段是原型开发,通过率30%;第三阶段是市场测试...`
 
 // 计算属性
 const inputText = computed({
@@ -78,7 +94,7 @@ const hasValidInput = computed(() => {
 
 const isAnalyzing = computed(() => workspaceStore.isAnalyzing)
 
-async function handleAnalyze() {
+async function handleSmartGenerate() {
   if (!hasValidInput.value) {
     message.warning('请输入至少10个字的内容')
     return
@@ -86,33 +102,31 @@ async function handleAnalyze() {
   
   try {
     workspaceStore.setAnalyzing(true)
+    workspaceStore.setGenerationMode('smart')
     
-    // 调用智能生成API（三阶段流程）
+    // 调用智能生成API，请求返回所有模板
     const generateModule = await import('@/api/generate')
-    const response = await generateModule.generateAPI.smartGenerate(inputText.value)
+    const response = await generateModule.generateAPI.smartGenerate(inputText.value, true)
     
     console.log('[LeftInputPanel] 智能生成响应:', response)
     
     if (response.success && response.data) {
-      const { config, classification, selection } = response.data
+      const { config, classification, selection, allTemplates } = response.data
       
       console.log('[LeftInputPanel] 分类:', classification)
       console.log('[LeftInputPanel] 选择:', selection)
       console.log('[LeftInputPanel] 配置:', config)
-      
-      // 构建推荐列表（只包含选中的模板）
-      const recommendations = [{
-        templateId: selection.templateId,
-        templateName: selection.templateName,
-        confidence: selection.confidence,
-        matchScore: Math.round(selection.confidence * 100),
-        reason: selection.reason
-      }]
+      console.log('[LeftInputPanel] 所有模板:', allTemplates)
       
       // 更新store
-      templateStore.recommendations = recommendations
       workspaceStore.setSelectedTemplate(selection.templateId)
       workspaceStore.setConfig(config)
+      workspaceStore.cacheTemplateConfig(selection.templateId, config)
+      
+      // 设置所有模板列表
+      if (allTemplates && allTemplates.length > 0) {
+        workspaceStore.setAllTemplates(allTemplates)
+      }
       
       message.success(`分析完成！识别为${classification.type}类型，推荐使用${selection.templateName}`)
     } else {
@@ -124,6 +138,16 @@ async function handleAnalyze() {
   } finally {
     workspaceStore.setAnalyzing(false)
   }
+}
+
+function handleManualSelect() {
+  if (!hasValidInput.value) {
+    message.warning('请输入至少10个字的内容')
+    return
+  }
+  
+  workspaceStore.setGenerationMode('manual')
+  showTemplateModal.value = true
 }
 
 async function handleGenerate(templateId: string) {
@@ -180,7 +204,7 @@ function handleClear() {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px;
+  padding: 4px 6px;
   border-bottom: 1px solid #f0f0f0;
   flex-shrink: 0;
   background: #fff;
@@ -224,7 +248,7 @@ function handleClear() {
 
 .panel-body {
   flex: 1;
-  padding: 16px;
+  padding: 4px;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -260,15 +284,16 @@ function handleClear() {
   right: 0;
   display: flex;
   justify-content: center;
+  gap: 12px;
   padding: 0 24px;
   pointer-events: none;
 }
 
-.analyze-btn {
+.mode-btn {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 24px;
+  padding: 12px 20px;
   border-radius: 9999px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   color: white;
@@ -276,8 +301,10 @@ function handleClear() {
   transition: all 0.3s;
   border: none;
   cursor: pointer;
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
   pointer-events: auto;
+  flex: 1;
+  max-width: 180px;
+  justify-content: center;
   
   &:hover:not(:disabled) {
     transform: scale(1.05);
@@ -293,6 +320,14 @@ function handleClear() {
     cursor: not-allowed;
     transform: none;
   }
+}
+
+.smart-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+}
+
+.manual-btn {
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
 }
 
 .loading-spinner {
