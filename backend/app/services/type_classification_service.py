@@ -39,6 +39,12 @@ class TypeClassificationService:
         try:
             logger.info(f"[TypeClassification] 开始识别内容类型 - 文本长度: {len(user_text)}")
             
+            # 特殊处理：检测SWOT分析内容
+            swot_result = self._detect_swot_content(user_text)
+            if swot_result:
+                logger.info(f"[TypeClassification] 检测到SWOT内容，直接返回comparison类型")
+                return swot_result
+            
             # 获取提示词
             system_prompt, user_prompt, temperature, model = \
                 self.prompt_manager.get_type_classification_prompt(user_text)
@@ -78,6 +84,47 @@ class TypeClassificationService:
         except Exception as e:
             logger.error(f"[TypeClassification] 识别失败: {e}")
             raise
+    
+    def _detect_swot_content(self, user_text: str) -> Dict[str, Any]:
+        """
+        检测文本是否为SWOT分析内容
+        
+        Args:
+            user_text: 用户输入的文本
+        
+        Returns:
+            Dict: 如果是SWOT内容，返回classification结果；否则返回None
+        """
+        import re
+        
+        # 转换为小写进行匹配
+        text_lower = user_text.lower()
+        
+        # SWOT关键词匹配
+        swot_keywords = [
+            'swot',
+            'strengths',
+            'weaknesses', 
+            'opportunities',
+            'threats',
+            '优势',
+            '劣势',
+            '机会',
+            '威胁'
+        ]
+        
+        # 计算匹配到的关键词数量
+        matched_count = sum(1 for keyword in swot_keywords if keyword in text_lower)
+        
+        # 如果匹配到3个或以上SWOT相关关键词，认为是SWOT分析
+        if matched_count >= 3:
+            return {
+                "type": "comparison",
+                "confidence": 0.98,
+                "reason": f"文本包含SWOT分析的关键要素（匹配{matched_count}个关键词），属于对比型内容，应使用SWOT分析模板展示优势、劣势、机会、威胁四个维度的对比分析。"
+            }
+        
+        return None
     
     def _parse_response(self, response: str) -> Dict[str, Any]:
         """

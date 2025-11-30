@@ -34,7 +34,7 @@
           
           <!-- 模板内容 -->
           <div class="template-content">
-            <div class="template-name">{{ template.templateName }}</div>
+            <div class="template-name">{{ template.templateName || template.templateId }}</div>
             <div class="template-reason">{{ template.reason }}</div>
           </div>
         </div>
@@ -88,6 +88,12 @@ async function handleTemplateClick(templateId: string) {
   }
   
   try {
+    // 对于 compare-hierarchy-left-right，清除缓存以确保加载最新配置
+    if (templateId === 'compare-hierarchy-left-right') {
+      console.log('[TemplateListBar] 清除 compare-hierarchy-left-right 缓存，确保加载最新配置')
+      workspaceStore.clearTemplateCache(templateId)
+    }
+    
     // 检查缓存
     const cachedConfig = workspaceStore.getCachedConfig(templateId)
     if (cachedConfig) {

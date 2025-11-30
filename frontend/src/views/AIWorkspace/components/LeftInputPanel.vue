@@ -128,7 +128,7 @@ async function handleSmartGenerate() {
         workspaceStore.setAllTemplates(allTemplates)
       }
       
-      message.success(`分析完成！识别为${classification.type}类型，推荐使用${selection.templateName}`)
+      message.success(`分析完成！识别为${classification.type}类型，推荐使用${selection.templateName || selection.templateId}`)
     } else {
       message.warning('未找到合适的模板，请尝试调整输入内容')
     }

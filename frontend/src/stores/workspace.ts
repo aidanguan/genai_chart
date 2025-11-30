@@ -85,6 +85,14 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     return templateCache.value.get(templateId)
   }
   
+  function clearTemplateCache(templateId: string) {
+    templateCache.value.delete(templateId)
+  }
+  
+  function clearAllCache() {
+    templateCache.value.clear()
+  }
+  
   return {
     // 状态
     inputText,
@@ -108,6 +116,8 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     setAllTemplates,
     cacheTemplateConfig,
     getCachedConfig,
+    clearTemplateCache,
+    clearAllCache,
     reset
   }
 })

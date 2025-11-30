@@ -217,7 +217,8 @@ const selectedTemplateId = computed({
 
 const currentTemplateName = computed(() => {
   const current = recommendations.value.find(r => r.templateId === selectedTemplateId.value)
-  return current?.templateName || '选择模板'
+  // 兼容templateName可能不存在的情况
+  return current?.templateName || current?.reason || '选择模板'
 })
 
 // 监听点击外部关闭下拉菜单
@@ -452,7 +453,23 @@ async function handleTemplateSelect(templateId: string) {
 
 function renderInfographic(cfg: any) {
   try {
-    console.log('渲染配置:', cfg)
+    console.log('========== 渲染配置详情 ==========')
+    console.log('1. 原始配置:', JSON.stringify(cfg, null, 2))
+    console.log('2. template:', cfg.template)
+    console.log('3. design:', cfg.design)
+    console.log('4. data.items:', cfg.data?.items)
+    
+    if (cfg.data?.items) {
+      cfg.data.items.forEach((item: any, index: number) => {
+        console.log(`   根节点${index + 1}: label="${item.label}", children=${item.children?.length}`)
+        if (item.children) {
+          item.children.forEach((child: any, ci: number) => {
+            console.log(`     Child${ci + 1}: ${child.label} - ${child.desc}`)
+          })
+        }
+      })
+    }
+    console.log('==================================')
     
     if (!canvasRef.value) {
       console.warn('画布容器不存在')

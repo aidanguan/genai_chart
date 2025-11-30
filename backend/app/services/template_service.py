@@ -61,7 +61,7 @@ TEMPLATE_DESIGN_MAP = {
         "design": {
             "structure": {"type": "quadrant"},
             "title": "default",
-            "item": "badge-card"  # 使用badge-card样式展示矩阵项
+            "items": [{"type": "quarter-simple-card"}]  # 使用quarter-simple-card样式展示四象限
         }
     },
     "timeline-horizontal": {
@@ -79,17 +79,39 @@ TEMPLATE_DESIGN_MAP = {
         }
     },
     "swot-analysis": {
-        "design": {
-            "structure": {"type": "quadrant-swot"},
-            "title": "default",
-            "item": "badge-card"  # SWOT分析使用badge-card
-        }
+        "template": "compare-swot"  # 使用AntV Infographic内置的compare-swot模板
     },
     "org-tree": {
         "design": {
             "structure": {"type": "hierarchy-tree"},
             "title": "default",
             "item": "badge-card"  # 组织树使用badge-card
+        }
+    },
+    "compare-hierarchy-left-right": {
+        "template": "compare-hierarchy-left-right-circle-node-pill-badge"
+    },
+    "compare-hierarchy-left-right-circle-node-pill-badge": {
+        "template": "compare-hierarchy-left-right-circle-node-pill-badge"
+    },
+    "compare-binary-horizontal": {
+        "design": {
+            "structure": {
+                "type": "compare-binary-horizontal",
+                "dividerType": "vs"
+            },
+            "title": "default",
+            "items": [{"type": "simple", "iconType": "circle", "iconSize": 40}]
+        }
+    },
+    "compare-binary-vs": {
+        "design": {
+            "structure": {
+                "type": "compare-binary-horizontal",
+                "dividerType": "vs"
+            },
+            "title": "default",
+            "items": [{"type": "badge-card"}]
         }
     },
 }

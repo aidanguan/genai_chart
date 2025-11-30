@@ -189,44 +189,111 @@ def get_data_extract_prompt(
     请根据每个步骤的含义选择合适的mdi图标，可在 https://icon-sets.iconify.design/mdi/ 查找更多图标
   * children: **对于对比型(compare-binary-horizontal)模板必填**，子项列表，用于表示每个根节点下的子数据项
 
-## 特殊结构的数据格式说明：
+# 特殊结构的数据格式说明：
 
-### 对比型模板 (compare-binary-horizontal)
-对比型模板使用特殊的两层数据结构，items数组必须包含**恰好2个根节点**（左右两侧），每个根节点包含children数组：
+## SWOT分析模板 (swot-analysis)
+SWOT分析模板使用特殊的四维度数据结构，items数组必须包含**恰好4个根节点**（优势、劣势、机会、威胁），每个根节点包含children数组：
 
-示例结构：
+**适用模板**：
+- swot-analysis（SWOT四象限分析）
+
+**数据结构示例**：
+对于用户输入"SWOT分析：优势包括强大的品牌、丰富的产品线。劣势包括市场份额有限。机会包括新兴市场。威胁包括激烈竞争。"
+
+**关键理解**：
+1. 四个根节点的label必须是: "Strengths"、"Weaknesses"、"Opportunities"、"Threats"
+2. 每个维度的具体要点放在children数组中
+3. children中的每个对象只需要label字段（不需要desc、icon等）
+
+应提取为：
 {{
   "data": {{
-    "title": "对比主题",
-    "desc": "对比说明",
+    "title": "公司SWOT分析",
+    "desc": "战略分析概览",
     "items": [
       {{
-        "label": "左侧标题(如:优势/iPhone/方案A)",
+        "label": "Strengths",
+        "children": [
+          {{"label": "强大的品牌影响力"}},
+          {{"label": "丰富的产品线和服务"}}
+        ]
+      }},
+      {{
+        "label": "Weaknesses",
+        "children": [
+          {{"label": "市场份额有限"}}
+        ]
+      }},
+      {{
+        "label": "Opportunities",
+        "children": [
+          {{"label": "新兴市场的增长机会"}}
+        ]
+      }},
+      {{
+        "label": "Threats",
+        "children": [
+          {{"label": "激烈的市场竞争"}}
+        ]
+      }}
+    ]
+  }}
+}}
+
+**SWOT关键要求**：
+- items数组必须有且仅有4个根节点
+- **根节点label必须严格使用英文**: "Strengths"、"Weaknesses"、"Opportunities"、"Threats"
+- **每个根节点必须有children数组**，即使只有一个要点
+- **children中的对象格式**: {{"label": "要点内容"}} （只需label字段）
+- **不要在children中添加desc、icon等额外字段**
+
+## 对比型模板 (compare-binary-horizontal, compare-hierarchy-left-right)
+对比型模板使用特殊的两层数据结构，items数组必须包含**恰好2个根节点**（左右两侧），每个根节点包含children数组：
+
+**适用模板**：
+- compare-binary-horizontal（横向二元对比）
+- compare-hierarchy-left-right（左右层级对比）
+
+**数据结构示例**：
+对于用户输入"方案1：优势是价格便宜，但是质量差。方案2：优势是质量好，但是价格贵。"
+
+**关键理解**：
+1. "方案1"和"方案2"是两个根节点的label（对比的主体）
+2. "优势"和"劣势"是children中的label（对比的维度）
+3. 具体描述"价格便宜"、"质量差"等是children中的desc
+
+应提取为：
+{{
+  "data": {{
+    "title": "方案对比",
+    "items": [
+      {{
+        "label": "方案1",  // 注意：这里是"方案1"，不是"左侧"！
         "children": [
           {{
-            "label": "子项1标题",
-            "desc": "子项1描述",
+            "label": "优势",  // 注意：这里是对比维度，不是方案名！
+            "desc": "价格便宜",
             "icon": "icon:mdi/check-circle"
           }},
           {{
-            "label": "子项2标题",
-            "desc": "子项2描述",
-            "icon": "icon:mdi/star"
+            "label": "劣势",
+            "desc": "质量差",
+            "icon": "icon:mdi/alert-circle"
           }}
         ]
       }},
       {{
-        "label": "右侧标题(如:劣势/Android/方案B)",
+        "label": "方案2",  // 注意：这里是"方案2"，不是"右侧"！
         "children": [
           {{
-            "label": "子项1标题",
-            "desc": "子项1描述",
-            "icon": "icon:mdi/alert-circle"
+            "label": "优势",
+            "desc": "质量好",
+            "icon": "icon:mdi/check-circle"
           }},
           {{
-            "label": "子项2标题",
-            "desc": "子项2描述",
-            "icon": "icon:mdi/close-circle"
+            "label": "劣势",
+            "desc": "价格贵",
+            "icon": "icon:mdi/alert-circle"
           }}
         ]
       }}
@@ -234,14 +301,72 @@ def get_data_extract_prompt(
   }}
 }}
 
+**更多示例**：
+例1："iPhone vs Android"
+{{
+  "items": [
+    {{
+      "label": "iPhone",  // 根节点是产品名
+      "children": [
+        {{"label": "优势", "desc": "生态系统好", "icon": "icon:mdi/check-circle"}},
+        {{"label": "劣势", "desc": "价格昂贵", "icon": "icon:mdi/alert-circle"}}
+      ]
+    }},
+    {{"label": "Android", "children": [...]}}
+  ]
+}}
+
+例2："传统营销 vs 数字营销"
+{{
+  "items": [
+    {{
+      "label": "传统营销",  // 根节点是营销方式
+      "children": [
+        {{"label": "特点", "desc": "覆盖面广", "icon": "icon:mdi/bullhorn"}},
+        {{"label": "成本", "desc": "投入高", "icon": "icon:mdi/currency-usd"}}
+      ]
+    }},
+    {{"label": "数字营销", "children": [...]}}
+  ]
+}}
+
 **关键要求**：
 - items数组必须有且仅有2个根节点元素
-- 每个根节点必须有children数组
-- 根节点的label表示左右两侧的标题
-- children中的每个对象包含label、desc和icon字段
+- **每个根节点的label是对比的主体**（如：方案1、方案2、iPhone、Android、传统营销、数字营销）
+- **每个根节点必须有children数组，children中的项才是详细对比内容**
+- **children中的label是对比维度**（如：优势、劣势、特点、成本等）
+- **children中的desc是具体描述**
+- **不要使用"左侧"、"右侧"这样的占位符作为根节点label**
 
-请严格按照JSON格式返回提取的数据，**不要包含任何markdown代码块标记(如```json)**,不要包含任何其他文字说明,直接返回JSON对象:
+## 最终返回格式示例：
 
+**对于对比型模板 (compare-binary-horizontal, compare-hierarchy-left-right)，请严格按照以下格式返回：**
+{{
+  "template": "{template_id}",
+  "data": {{
+    "title": "方案对比",
+    "desc": "对比说明",
+    "items": [
+      {{
+        "label": "方案1",  // 必须是具体名称，不是"左侧"!
+        "children": [
+          {{"label": "优势", "desc": "价格便宜", "icon": "icon:mdi/check-circle"}},
+          {{"label": "劣势", "desc": "质量差", "icon": "icon:mdi/alert-circle"}}
+        ]
+      }},
+      {{
+        "label": "方案2",  // 必须是具体名称，不是"右侧"!
+        "children": [
+          {{"label": "优势", "desc": "质量好", "icon": "icon:mdi/check-circle"}},
+          {{"label": "劣势", "desc": "价格贵", "icon": "icon:mdi/alert-circle"}}
+        ]
+      }}
+    ]
+  }},
+  "themeConfig": {{"palette": "antv"}}
+}}
+
+**对于非对比型模板，请使用一般格式：**
 {{
   "template": "{template_id}",
   "data": {{
@@ -256,9 +381,7 @@ def get_data_extract_prompt(
       }}
     ]
   }},
-  "themeConfig": {{
-    "palette": "antv"
-  }}
+  "themeConfig": {{"palette": "antv"}}
 }}
 
 注意：确保返回有效的JSON格式，数组中的每个对象都包含必需的字段。"""

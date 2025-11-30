@@ -5,6 +5,7 @@
 """
 import logging
 import time
+import json
 from typing import Dict, Any, Optional
 from app.services.llm_client import get_llm_client
 from app.services.template_service import get_template_service
@@ -24,8 +25,6 @@ STRUCTURE_TYPE_FALLBACK_MAP = {
     "timeline-horizontal": "list-row-horizontal-icon-arrow",
     # 双栏对比 -> 简单列表（展示两组数据）
     "comparison-column": "list-column-simple",
-    # SWOT四象限 -> 金字塔层级图（展示4个维度）
-    "quadrant-swot": "pyramid-layer",
     # 放射状思维导图 -> 组织架构树
     "mindmap-radial": "org-tree"
 }
@@ -327,6 +326,11 @@ class GenerateService:
         
         workflow_data = dify_result['data']
         
+        # 如果是四象限模板，需要将quadrants结构转换为items数组
+        if template_id == 'matrix-2x2':
+            logger.info(f"[Dify数据转换] 四象限模板 {template_id}，执行 quadrants → items 转换")
+            workflow_data = self._convert_quadrants_to_items(workflow_data)
+        
         # 数据校验
         template_schema = template.get('dataSchema', {})
         validation_result = self.data_validator.validate_against_schema(
@@ -388,13 +392,36 @@ class GenerateService:
             template_schema=template_schema
         )
         
+        logger.info(f"[LLM原始返回] Template: {template_id}")
+        logger.info(f"[LLM原始返回] Data: {json.dumps(extracted_data, indent=2, ensure_ascii=False)}")
+        print("\n" + "=" * 80)
+        print(f"[LLM原始返回] Template: {template_id}")
+        print(f"[LLM原始返回] Data:")
+        print(json.dumps(extracted_data, indent=2, ensure_ascii=False))
+        print("=" * 80 + "\n")
+        
+        # 写入文件便于调试
+        import os
+        debug_file = os.path.join(os.path.dirname(__file__), '../../llm_debug.json')
+        with open(debug_file, 'w', encoding='utf-8') as f:
+            json.dump({
+                'user_text': user_text,
+                'template_id': template_id,
+                'llm_response': extracted_data
+            }, f, ensure_ascii=False, indent=2)
+        
         # 如果是组织架构树,需要将数据转换为树形结构
         if template_id == 'org-tree':
             extracted_data = self._convert_to_tree_data(extracted_data)
         
-        # 如果是对比型模板(compare-binary-horizontal),需要将数据转换为两层结构
-        if template_id in ['compare-binary-vs', 'compare-binary-horizontal', 'comparison-two-column'] or \
-           (template.get('category') == 'comparison' and 'compare' in template_id):
+        # 如果是四象限模板，需要将quadrants结构转换为items数组
+        if template_id == 'matrix-2x2':
+            extracted_data = self._convert_quadrants_to_items(extracted_data)
+        
+        # 如果是对比型模板(compare-binary-horizontal)，需要将数据转换为两层结构
+        # 注意：compare-hierarchy-left-right 已经通过 prompt 和 schema 确保 LLM 返回正确结构，不需要转换
+        # 明确排除 compare-hierarchy-left-right 避免误转换
+        if template_id in ['compare-binary-vs', 'compare-binary-horizontal', 'comparison-two-column'] and template_id != 'compare-hierarchy-left-right':
             extracted_data = self._convert_to_comparison_structure(extracted_data)
         
         # 获取AntV模板配置映射
@@ -504,7 +531,7 @@ class GenerateService:
     
     def _convert_to_comparison_structure(self, extracted_data: Dict[str, Any]) -> Dict[str, Any]:
         """
-        将扫平的items数组转换为对比型所需的两层结构
+        将扫平的items数组或left/right结构转换为对比型所需的两层items结构
         
         对比型需要的数据结构：
         {
@@ -521,17 +548,77 @@ class GenerateService:
         }
         
         Args:
-            extracted_data: 原始提取数据，包含扫平的 items 数组
+            extracted_data: 原始提取数据，可能是扫平的 items 数组或 left/right 结构
         
         Returns:
             Dict: 转换为两层结构的数据
         """
         data = extracted_data.get('data', {})
+        
+        # 检查是否已经是left/right结构
+        if 'left' in data and 'right' in data:
+            # 将left/right结构转换为items数组结构
+            left_data = data['left']
+            right_data = data['right']
+            
+            comparison_data = {
+                "title": data.get('title', ''),
+                "desc": data.get('desc', ''),
+                "items": [
+                    {
+                        "label": left_data.get('title', '左侧'),
+                        "children": left_data.get('items', [])
+                    },
+                    {
+                        "label": right_data.get('title', '右侧'),
+                        "children": right_data.get('items', [])
+                    }
+                ]
+            }
+            
+            logger.info(f"[对比型转换] 将left/right结构转换为items数组")
+            
+            return {
+                "data": comparison_data,
+                "themeConfig": extracted_data.get('themeConfig', {})
+            }
+        
+        # 原有的扁平items数组转换逻辑
         items = data.get('items', [])
         
         if not items or len(items) < 2:
             # 如果没有足够的数据，直接返回
             return extracted_data
+        
+        # **关键检查**：如果 items 已经是两层结构（每个 item 都有 children 且不为空），直接返回
+        print(f"\n[DEBUG 转换检查] Items数量: {len(items)}")
+        for i, item in enumerate(items):
+            print(f"[DEBUG 转换检查] Item{i+1}: label={item.get('label')}, has_children={'children' in item}, children_count={len(item.get('children', []))}")
+            if 'children' in item:
+                for j, child in enumerate(item.get('children', [])):
+                    print(f"[DEBUG 转换检查]   Child{j+1}: label={child.get('label')}, has_desc={bool(child.get('desc'))}")
+        
+        if len(items) == 2 and all('children' in item and isinstance(item.get('children'), list) and len(item.get('children', [])) > 0 for item in items):
+            # 进一步检查：children中的项应该有label和desc，而不是只有一个项且label是"方案X"
+            is_valid_structure = True
+            for item in items:
+                children = item.get('children', [])
+                # 如果children只有一个，且没有desc，可能是错误结构
+                if len(children) == 1 and not children[0].get('desc'):
+                    is_valid_structure = False
+                    print(f"[DEBUG 转换检查] Item '{item.get('label')}' 结构无效: children只有1个且无desc")
+                    break
+            
+            if is_valid_structure:
+                print(f"[DEBUG 转换检查] ✅ 数据结构有效，直接返回")
+                logger.info(f"[对比型转换] 数据已是正确的两层结构，直接返回")
+                logger.info(f"[对比型转换] Item 1 label: {items[0].get('label', '')}")
+                logger.info(f"[对比型转换] Item 2 label: {items[1].get('label', '')}")
+                logger.info(f"[对比型转换] Item 1 children: {len(items[0].get('children', []))} items")
+                logger.info(f"[对比型转换] Item 2 children: {len(items[1].get('children', []))} items")
+                return extracted_data
+            else:
+                print(f"[DEBUG 转换检查] ❌ 数据结构无效，需要转换")
         
         # 尝试智能分组：将items分为左右两组
         # 策略：前半部分为左侧，后半部分为右侧
@@ -595,6 +682,92 @@ class GenerateService:
         return {
             "data": comparison_data,
             "themeConfig": extracted_data.get('themeConfig', {})
+        }
+    
+    def _convert_quadrants_to_items(self, extracted_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        将四象限结构(quadrants数组)转换为Quadrant组件期望的items扁平数组
+        
+        输入结构：
+        {
+          "data": {
+            "title": "...",
+            "xAxis": "...",
+            "yAxis": "...",
+            "quadrants": [
+              {"label": "象限1", "items": [{"label": "...", "desc": "...", "icon": "..."}]},
+              {"label": "象限2", "items": [...]},
+              {"label": "象限3", "items": [...]},
+              {"label": "象限4", "items": [...]}
+            ]
+          }
+        }
+        
+        输出结构（Quadrant组件期望）：
+        {
+          "data": {
+            "title": "...",
+            "xAxis": "...",
+            "yAxis": "...",
+            "items": [
+              {"label": "...", "desc": "...", "icon": "..."},  // 第1象限的第1个item
+              {"label": "...", "desc": "...", "icon": "..."},  // 第2象限的第1个item
+              {"label": "...", "desc": "...", "icon": "..."},  // 第3象限的第1个item
+              {"label": "...", "desc": "...", "icon": "..."}   // 第4象限的第1个item
+            ]
+          }
+        }
+        
+        Args:
+            extracted_data: 原始提取数据，包含 quadrants 数组
+        
+        Returns:
+            Dict: 转换为items扁平数组的数据
+        """
+        data = extracted_data.get('data', {})
+        quadrants = data.get('quadrants', [])
+        
+        if not quadrants:
+            logger.warning("[四象限转换] quadrants数组为空，保持原数据不变")
+            return extracted_data
+        
+        # 提取每个象限的第一个item（如果存在）
+        # Quadrant组件期望4个items，分别对应4个象限
+        items = []
+        for i, quadrant in enumerate(quadrants[:4]):  # 限制最多4个象限
+            quadrant_items = quadrant.get('items', [])
+            if quadrant_items:
+                # 使用该象限的第一个item，并保留象限label作为额外信息
+                first_item = quadrant_items[0].copy()
+                # 可以选择将象限label添加到item中（可选）
+                # first_item['quadrantLabel'] = quadrant.get('label', '')
+                items.append(first_item)
+            else:
+                # 如果该象限没有items，使用象限label作为占位
+                items.append({
+                    'label': quadrant.get('label', f'象限{i+1}'),
+                    'desc': '',
+                    'icon': ''
+                })
+        
+        # 确保有4个items（不足补空）
+        while len(items) < 4:
+            items.append({'label': '', 'desc': '', 'icon': ''})
+        
+        # 构建新的data结构
+        quadrant_data = {
+            'title': data.get('title', ''),
+            'desc': data.get('desc', ''),
+            'xAxis': data.get('xAxis', ''),
+            'yAxis': data.get('yAxis', ''),
+            'items': items[:4]  # 只保留前4个
+        }
+        
+        logger.info(f"[四象限转换] 将{len(quadrants)}个quadrants转换为{len(quadrant_data['items'])}个items")
+        
+        return {
+            'data': quadrant_data,
+            'themeConfig': extracted_data.get('themeConfig', {})
         }
 
 

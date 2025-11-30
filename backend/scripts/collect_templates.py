@@ -264,18 +264,31 @@ def create_initial_templates() -> List[Dict[str, Any]]:
             "use_cases": "优势劣势分析、机会威胁分析、战略分析",
             "preview_url": "",
             "data_schema": {
-                "description": "SWOT分析",
+                "description": "SWOT分析 - 使用compare-swot模板的items+children结构",
                 "dataFields": {
-                    "title": {"type": "string", "required": False},
-                    "strengths": {"type": "array", "required": True, "description": "优势"},
-                    "weaknesses": {"type": "array", "required": True, "description": "劣势"},
-                    "opportunities": {"type": "array", "required": True, "description": "机会"},
-                    "threats": {"type": "array", "required": True, "description": "威胁"}
+                    "title": {"type": "string", "required": False, "description": "标题"},
+                    "desc": {"type": "string", "required": False, "description": "描述"},
+                    "items": {
+                        "type": "array",
+                        "required": True,
+                        "description": "四个SWOT维度",
+                        "itemSchema": {
+                            "label": {"type": "string", "required": True, "description": "维度名称(Strengths/Weaknesses/Opportunities/Threats)"},
+                            "children": {
+                                "type": "array",
+                                "required": True,
+                                "description": "该维度下的要点列表",
+                                "itemSchema": {
+                                    "label": {"type": "string", "required": True, "description": "要点内容"}
+                                }
+                            }
+                        }
+                    }
                 }
             },
             "design_config": {
                 "design": {
-                    "structure": {"type": "quadrant-swot"},
+                    "structure": {"type": "compare-swot"},
                     "title": "default"
                 }
             },

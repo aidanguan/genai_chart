@@ -195,7 +195,7 @@ async function handleTemplateSelect(templateId: string) {
         workspaceStore.setAllTemplates(allTemplates)
       }
       
-      message.success(`已生成${selectedTemplate.templateName}`)
+      message.success(`已生成${selectedTemplate.templateName || selectedTemplate.templateId}`)
     } else {
       message.error('生成失败')
     }
