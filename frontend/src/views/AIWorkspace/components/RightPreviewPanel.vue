@@ -8,6 +8,18 @@
       </div>
       
       <div class="header-right" v-if="hasConfig">
+        <!-- 配色调整按钮 -->
+        <button class="action-btn" @click="togglePropertyPanel" :class="{ 'active': propertyPanelVisible }">
+          <Settings :size="14" />
+          <span class="btn-text">配色</span>
+        </button>
+        
+        <!-- 查看代码按钮 -->
+        <button class="action-btn" @click="showConfigViewer">
+          <Code :size="14" />
+          <span class="btn-text">查看代码</span>
+        </button>
+        
         <!-- 导出按钮（下拉菜单） -->
         <div class="export-dropdown" ref="exportDropdownRef">
           <button class="action-btn" @click="toggleExportDropdown">
@@ -37,6 +49,12 @@
         <button class="action-btn primary" @click="handleSave">
           <Save :size="14" />
           <span class="btn-text">保存</span>
+        </button>
+        
+        <!-- 分享到示例按钮 -->
+        <button class="action-btn" @click="showShareDialog">
+          <Share2 :size="14" />
+          <span class="btn-text">分享到示例</span>
         </button>
       </div>
     </div>
@@ -90,8 +108,32 @@
             </div>
           </div>
         </div>
+        
+        <!-- 属性编辑器 -->
+        <PropertyPanel 
+          v-model:visible="propertyPanelVisible"
+          :selectedElement="selectedElement"
+          :config="config"
+          @text-change="handleTextChange"
+          @visibility-change="handleVisibilityChange"
+          @color-change="handleColorChange"
+        />
       </div>
     </div>
+    
+    <!-- 配置JSON查看器弹窗 -->
+    <ConfigJsonViewer 
+      v-model:visible="configViewerVisible" 
+      :config="config" 
+    />
+    
+    <!-- 分享到示例对话框 -->
+    <ShareToExamplesDialog 
+      v-model:visible="shareDialogVisible" 
+      :config="config"
+      :inputText="workspaceStore.inputText"
+      @success="handleShareSuccess"
+    />
   </div>
 </template>
 
@@ -105,13 +147,19 @@ import {
   Maximize,
   CheckCircle2,
   ChevronDown,
-  Check
+  Check,
+  Code,
+  Share2,
+  Settings
 } from 'lucide-vue-next'
 import { message } from 'ant-design-vue'
 import { useWorkspaceStore } from '@/stores/workspace'
 import { useTemplateStore } from '@/stores/template'
 import { Infographic, registerResourceLoader, loadSVGResource } from '@antv/infographic'
 import TemplateListBar from './TemplateListBar.vue'
+import ConfigJsonViewer from './ConfigJsonViewer.vue'
+import ShareToExamplesDialog from './ShareToExamplesDialog.vue'
+import PropertyPanel from './PropertyPanel.vue'
 
 // 注册资源加载器,用于加载图标
 registerResourceLoader(async (config) => {
@@ -145,11 +193,13 @@ const workspaceStore = useWorkspaceStore()
 const templateStore = useTemplateStore()
 
 const canvasRef = ref<HTMLElement>()
-const dropdownRef = ref<HTMLElement>()
 const exportDropdownRef = ref<HTMLElement>()
 const zoomLevel = ref(1)
-const isDropdownOpen = ref(false)
 const isExportDropdownOpen = ref(false)
+const configViewerVisible = ref(false) // 配置JSON查看器显示状态
+const shareDialogVisible = ref(false) // 分享对话框显示状态
+const propertyPanelVisible = ref(false) // 属性面板显示状态
+const selectedElement = ref<any>(null) // 当前选中的元素
 let infographicInstance: any = null // 使用 any 避免类型问题
 
 // 计算属性
@@ -173,9 +223,6 @@ const currentTemplateName = computed(() => {
 // 监听点击外部关闭下拉菜单
 onMounted(() => {
   const handleClickOutside = (event: MouseEvent) => {
-    if (dropdownRef.value && !dropdownRef.value.contains(event.target as Node)) {
-      isDropdownOpen.value = false
-    }
     if (exportDropdownRef.value && !exportDropdownRef.value.contains(event.target as Node)) {
       isExportDropdownOpen.value = false
     }
@@ -215,22 +262,173 @@ watch(config, async (newConfig) => {  console.log('[RightPreviewPanel] config变
 }, { deep: true, immediate: true })
 
 // 方法
-function toggleDropdown() {
-  isDropdownOpen.value = !isDropdownOpen.value
+function togglePropertyPanel() {
+  propertyPanelVisible.value = !propertyPanelVisible.value
 }
 
 function toggleExportDropdown() {
   isExportDropdownOpen.value = !isExportDropdownOpen.value
 }
 
+// 显示配置JSON查看器
+function showConfigViewer() {
+  configViewerVisible.value = true
+}
+
+// 显示分享对话框
+function showShareDialog() {
+  shareDialogVisible.value = true
+}
+
+// 分享成功回调
+function handleShareSuccess() {
+  // 可选：分享成功后的处理
+  message.success('作品已成功分享到示例库')
+}
+
+// 属性面板相关处理函数
+function handleTextChange(data: { path: string; value: string }) {
+  // 更新配置中的文本内容
+  console.log('文本变更:', data)
+  
+  const currentConfig = workspaceStore.infographicConfig
+  if (!currentConfig) return
+  
+  // 创建新的配置对象
+  const newConfig = JSON.parse(JSON.stringify(currentConfig))
+  
+  // 根据path更新对应的值
+  // path格式: "data.title" 或 "data.items[0].label"
+  const pathParts = data.path.split('.')
+  let target: any = newConfig
+  
+  // 遍历路径，找到目标对象
+  for (let i = 0; i < pathParts.length - 1; i++) {
+    const part = pathParts[i]
+    // 处理数组索引，如 items[0]
+    const arrayMatch = part.match(/(\w+)\[(\d+)\]/)
+    if (arrayMatch) {
+      const [, key, index] = arrayMatch
+      target = target[key][parseInt(index)]
+    } else {
+      target = target[part]
+    }
+  }
+  
+  // 设置最细的值
+  const lastPart = pathParts[pathParts.length - 1]
+  const arrayMatch = lastPart.match(/(\w+)\[(\d+)\]/)
+  if (arrayMatch) {
+    const [, key, index] = arrayMatch
+    target[key][parseInt(index)] = data.value
+  } else {
+    target[lastPart] = data.value
+  }
+  
+  // 更新store中的配置，触发重新渲染
+  workspaceStore.setConfig(newConfig)
+  message.success('文本已更新')
+}
+
+function handleVisibilityChange(data: { path: string; visible: boolean }) {
+  // 更新元素可见性
+  console.log('可见性变更:', data)
+  
+  const currentConfig = workspaceStore.infographicConfig
+  if (!currentConfig) return
+  
+  // 创建新的配置对象
+  const newConfig = JSON.parse(JSON.stringify(currentConfig))
+  
+  // 根据path查找目标元素
+  const pathParts = data.path.split('.')
+  let target: any = newConfig
+  let parent: any = null
+  let lastKey: string = ''
+  
+  // 遍历路径，找到目标对象的父级
+  for (let i = 0; i < pathParts.length - 1; i++) {
+    const part = pathParts[i]
+    parent = target
+    const arrayMatch = part.match(/(\w+)\[(\d+)\]/)
+    if (arrayMatch) {
+      const [, key, index] = arrayMatch
+      target = target[key][parseInt(index)]
+      lastKey = key
+    } else {
+      target = target[part]
+      lastKey = part
+    }
+  }
+  
+  const finalKey = pathParts[pathParts.length - 1]
+  
+  if (data.visible) {
+    // 显示元素 - 仅需记录日志，不需修改配置
+    message.success('元素已显示')
+  } else {
+    // 隐藏元素 - 将字段值置为空或删除
+    const arrayMatch = finalKey.match(/(\w+)\[(\d+)\]/)
+    if (arrayMatch) {
+      const [, key, index] = arrayMatch
+      // 删除数组中的该项
+      target[key].splice(parseInt(index), 1)
+    } else {
+      // 将字段置为空字符串
+      target[finalKey] = ''
+    }
+    message.success('元素已隐藏')
+  }
+  
+  // 更新store中的配置，触发重新渲染
+  workspaceStore.setConfig(newConfig)
+}
+
+function handleColorChange(data: { type: 'primary' | 'bg' | 'palette'; value: any }) {
+  // 更新配色方案
+  console.log('配色变更:', data)
+  
+  const currentConfig = workspaceStore.infographicConfig
+  if (!currentConfig) return
+  
+  // 创建新的配置对象
+  const newConfig = JSON.parse(JSON.stringify(currentConfig))
+  
+  // 确保themeConfig存在
+  if (!newConfig.themeConfig) {
+    newConfig.themeConfig = {}
+  }
+  
+  // 根据类型更新配置
+  if (data.type === 'primary') {
+    newConfig.themeConfig.colorPrimary = data.value
+    // 清空调色板，让主色生效（因为palette优先级更高）
+    delete newConfig.themeConfig.palette
+    message.success('主色调已更新')
+  } else if (data.type === 'bg') {
+    newConfig.themeConfig.colorBg = data.value
+    message.success('背景色已更新')
+  } else if (data.type === 'palette') {
+    if (data.value === null || data.value === undefined) {
+      // 清空调色板，使用主色
+      delete newConfig.themeConfig.palette
+      message.success('已切换为使用主色')
+    } else {
+      newConfig.themeConfig.palette = data.value
+      message.success('调色板已更新')
+    }
+  }
+  
+  // 更新store中的配置，触发重新渲染
+  workspaceStore.setConfig(newConfig)
+}
+
 async function handleTemplateSelect(templateId: string) {
   if (templateId === selectedTemplateId.value) {
-    isDropdownOpen.value = false
     return
   }
   
   try {
-    isDropdownOpen.value = false
     message.loading('正在切换模板...', 0)
     
     // 重新生成信息图
@@ -292,9 +490,301 @@ function renderInfographic(cfg: any) {
     infographicInstance.render()
     console.log('信息图渲染成功')
     message.success('信息图渲染成功')
+    
+    // 渲染完成后，为SVG元素添加点击事件监听器
+    nextTick(() => {
+      attachElementListeners()
+    })
   } catch (error: any) {
     console.error('渲染失败:', error)
     message.error(`渲染失败: ${error.message || '未知错误'}`)
+  }
+}
+
+// 为SVG元素添加点击监听器，实现元素选中机制和直接编辑
+function attachElementListeners() {
+  if (!canvasRef.value) return
+  
+  const svgElement = canvasRef.value.querySelector('svg')
+  if (!svgElement) return
+  
+  // 查找所有可编辑的文本元素(包括 text 和 foreignObject 中的文本)
+  const textElements = svgElement.querySelectorAll('text, foreignObject')
+  
+  textElements.forEach((element) => {
+    // 添加样式，使元素可点击
+    const targetEl = element as SVGElement
+    targetEl.style.cursor = 'text'
+    targetEl.classList.add('editable-text')
+    
+    // 如果是foreignObject，为内部的span添加contenteditable
+    if (element.tagName === 'foreignObject') {
+      const span = element.querySelector('span')
+      if (span) {
+        span.setAttribute('contenteditable', 'true')
+        span.style.outline = 'none'
+        span.style.cursor = 'text'
+        
+        // 保存原始文本，用于检测变更
+        let originalText = span.textContent || ''
+        
+        // 点击时选中所有文本
+        span.addEventListener('click', (e) => {
+          e.stopPropagation()
+          // 选中当前元素
+          handleElementClick(element as SVGElement)
+          // 自动选中文本内容
+          const selection = window.getSelection()
+          const range = document.createRange()
+          range.selectNodeContents(span)
+          selection?.removeAllRanges()
+          selection?.addRange(range)
+        })
+        
+        // 聚焦时保存原始文本
+        span.addEventListener('focus', () => {
+          originalText = span.textContent || ''
+          targetEl.classList.add('editing')
+          targetEl.style.outline = '2px solid #3b82f6'
+          targetEl.style.outlineOffset = '2px'
+        })
+        
+        // 失焦时保存修改
+        span.addEventListener('blur', () => {
+          targetEl.classList.remove('editing')
+          const newText = span.textContent || ''
+          
+          if (newText !== originalText && newText.trim() !== '') {
+            // 文本已修改，保存到配置
+            saveTextEdit(element as SVGElement, originalText, newText)
+          } else if (newText.trim() === '') {
+            // 文本被清空，恢复原文本
+            span.textContent = originalText
+            message.warning('文本不能为空')
+          }
+          
+          // 清除选中状态
+          if (!targetEl.classList.contains('selected')) {
+            targetEl.style.outline = ''
+            targetEl.style.outlineOffset = ''
+          }
+        })
+        
+        // 按Enter键时失焦保存
+        span.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault()
+            span.blur()
+          }
+          // Esc键取消编辑
+          if (e.key === 'Escape') {
+            e.preventDefault()
+            span.textContent = originalText
+            span.blur()
+          }
+        })
+      }
+    } else {
+      // 对于普通text元素，保留原有的双击编辑面板功能
+      element.addEventListener('dblclick', (e) => {
+        e.stopPropagation()
+        handleElementClick(element as SVGElement)
+        propertyPanelVisible.value = true
+      })
+    }
+    
+    // 添加悬停效果
+    element.addEventListener('mouseenter', () => {
+      if (!targetEl.classList.contains('editing')) {
+        targetEl.style.outline = '2px solid rgba(59, 130, 246, 0.3)'
+        targetEl.style.outlineOffset = '2px'
+      }
+    })
+    
+    element.addEventListener('mouseleave', () => {
+      if (!targetEl.classList.contains('selected') && !targetEl.classList.contains('editing')) {
+        targetEl.style.outline = ''
+        targetEl.style.outlineOffset = ''
+      }
+    })
+    
+    // 单击选中
+    element.addEventListener('click', (e) => {
+      // foreignObject的点击由内部span处理
+      if (element.tagName !== 'foreignObject') {
+        e.stopPropagation()
+        handleElementClick(element as SVGElement)
+      }
+    })
+  })
+  
+  // 点击画布空白处取消选中
+  svgElement.addEventListener('click', () => {
+    clearSelection()
+  })
+  
+  console.log(`已为 ${textElements.length} 个文本元素添加交互监听器（支持直接编辑）`)
+}
+
+// 处理元素点击
+function handleElementClick(element: SVGElement) {
+  // 获取文本内容
+  let textContent = ''
+  if (element.tagName === 'foreignObject') {
+    const span = element.querySelector('span')
+    textContent = span?.textContent || ''
+  } else {
+    textContent = element.textContent || ''
+  }
+  
+  // 尝试从元素的data属性中获取路径信息
+  const elementId = element.getAttribute('id') || ''
+  const dataType = element.getAttribute('data-element-type') || ''
+  
+  // 智能推断元素类型和路径
+  let elementType: 'title' | 'desc' | 'item' | 'item-field' = 'item-field'
+  let path = ''
+  
+  // 根据ID和内容推断路径
+  if (elementId.includes('title') || dataType === 'title') {
+    elementType = 'title'
+    path = 'data.title'
+  } else if (elementId.includes('desc') || dataType === 'desc' || dataType === 'description') {
+    elementType = 'desc'
+    path = 'data.desc'
+  } else {
+    // 尝试从配置中查找匹配的文本
+    const currentConfig = workspaceStore.infographicConfig
+    if (currentConfig?.data) {
+      const found = findTextInConfig(currentConfig.data, textContent)
+      if (found) {
+        path = found.path
+        elementType = found.type as any
+      } else {
+        // 默认处理：假设是items中的某个字段
+        path = 'data.items[0].label'
+        elementType = 'item-field'
+      }
+    }
+  }
+  
+  // 清除之前的选中状态
+  clearSelection()
+  
+  // 设置选中元素
+  selectedElement.value = {
+    type: elementType,
+    path: path,
+    value: textContent
+  }
+  
+  // 添加选中样式
+  element.classList.add('selected')
+  element.style.outline = '2px solid #3b82f6'
+  element.style.outlineOffset = '2px'
+  
+  // 【FORCE UPDATE】最后更新: 2025-11-30 - 移除了弹窗提示
+  console.log('[UPDATED 2025-11-30] 选中元素 (无弹窗):', selectedElement.value)
+}
+
+// 在配置中查找文本的路径
+function findTextInConfig(data: any, text: string, prefix = 'data'): { path: string; type: string } | null {
+  // 检查标题
+  if (data.title === text) {
+    return { path: `${prefix}.title`, type: 'title' }
+  }
+  
+  // 检查描述
+  if (data.desc === text || data.description === text) {
+    return { path: `${prefix}.desc`, type: 'desc' }
+  }
+  
+  // 检查items数组
+  if (Array.isArray(data.items)) {
+    for (let i = 0; i < data.items.length; i++) {
+      const item = data.items[i]
+      
+      // 检查item的各个字段
+      if (item.label === text) {
+        return { path: `${prefix}.items[${i}].label`, type: 'item-field' }
+      }
+      if (item.value === text) {
+        return { path: `${prefix}.items[${i}].value`, type: 'item-field' }
+      }
+      if (item.desc === text || item.description === text) {
+        return { path: `${prefix}.items[${i}].desc`, type: 'item-field' }
+      }
+      if (item.title === text) {
+        return { path: `${prefix}.items[${i}].title`, type: 'item-field' }
+      }
+    }
+  }
+  
+  return null
+}
+
+// 清除选中状态
+function clearSelection() {
+  if (!canvasRef.value) return
+  
+  const svgElement = canvasRef.value.querySelector('svg')
+  if (!svgElement) return
+  
+  // 清除所有选中状态
+  const selectedElements = svgElement.querySelectorAll('.selected')
+  selectedElements.forEach((el) => {
+    el.classList.remove('selected')
+    ;(el as SVGElement).style.outline = ''
+    ;(el as SVGElement).style.outlineOffset = ''
+  })
+}
+
+// 保存文本编辑
+function saveTextEdit(element: SVGElement, oldText: string, newText: string) {
+  console.log('保存文本编辑:', { oldText, newText })
+  
+  const currentConfig = workspaceStore.infographicConfig
+  if (!currentConfig?.data) return
+  
+  // 尝试从配置中查找旧文本的路径
+  const found = findTextInConfig(currentConfig.data, oldText)
+  
+  if (found) {
+    // 找到了路径，更新配置
+    const newConfig = JSON.parse(JSON.stringify(currentConfig))
+    const pathParts = found.path.split('.')
+    let target: any = newConfig
+    
+    // 遍历路径，找到目标对象
+    for (let i = 0; i < pathParts.length - 1; i++) {
+      const part = pathParts[i]
+      // 处理数组索引，如 items[0]
+      const arrayMatch = part.match(/(\w+)\[(\d+)\]/)
+      if (arrayMatch) {
+        const [, key, index] = arrayMatch
+        target = target[key][parseInt(index)]
+      } else {
+        target = target[part]
+      }
+    }
+    
+    // 设置新值
+    const lastPart = pathParts[pathParts.length - 1]
+    const arrayMatch = lastPart.match(/(\w+)\[(\d+)\]/)
+    if (arrayMatch) {
+      const [, key, index] = arrayMatch
+      target[key][parseInt(index)] = newText
+    } else {
+      target[lastPart] = newText
+    }
+    
+    // 更新store中的配置，触发重新渲染
+    workspaceStore.setConfig(newConfig)
+    message.success('文本已更新')
+  } else {
+    // 未找到路径，提示用户
+    message.warning('无法定位文本在配置中的位置，请使用属性面板编辑')
+    console.warn('未找到文本路径:', oldText)
   }
 }
 
@@ -640,6 +1130,12 @@ onUnmounted(() => {
     color: #3b82f6;
   }
   
+  &.active {
+    color: #3b82f6;
+    border-color: #3b82f6;
+    background: #eff6ff;
+  }
+  
   &.primary {
     color: white;
     background: #3b82f6;
@@ -657,6 +1153,10 @@ onUnmounted(() => {
   position: relative;
 }
 
+.toolbar-dropdown {
+  position: relative;
+}
+
 .dropdown-arrow {
   color: #6b7280;
   transition: transform 0.2s;
@@ -671,6 +1171,20 @@ onUnmounted(() => {
   top: calc(100% + 8px);
   right: 0;
   min-width: 200px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #f0f0f0;
+  overflow: hidden;
+  z-index: 50;
+  animation: fadeIn 0.1s ease-out;
+}
+
+.toolbar-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 220px;
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -703,6 +1217,35 @@ onUnmounted(() => {
   }
   
   .export-desc {
+    font-size: 11px;
+    color: #9ca3af;
+    font-weight: 400;
+  }
+}
+
+.toolbar-item {
+  width: 100%;
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: #374151;
+  
+  &:hover {
+    background: #f9fafb;
+  }
+  
+  span:first-child {
+    font-weight: 500;
+  }
+  
+  .toolbar-desc {
     font-size: 11px;
     color: #9ca3af;
     font-weight: 400;
@@ -814,6 +1357,42 @@ onUnmounted(() => {
 .canvas {
   width: 100%;
   min-height: 400px;
+  
+  // 为可编辑文本添加全局样式
+  :deep(.editable-text) {
+    transition: all 0.2s ease;
+    
+    &:hover {
+      outline: 2px solid rgba(59, 130, 246, 0.3) !important;
+      outline-offset: 2px !important;
+    }
+    
+    &.selected {
+      outline: 2px solid #3b82f6 !important;
+      outline-offset: 2px !important;
+    }
+    
+    &.editing {
+      outline: 2px solid #3b82f6 !important;
+      outline-offset: 2px !important;
+      background: rgba(59, 130, 246, 0.05);
+    }
+  }
+  
+  // 为 contenteditable 的 span 添加样式
+  :deep(foreignObject span[contenteditable="true"]) {
+    outline: none;
+    cursor: text;
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    
+    &:focus {
+      outline: none;
+      background: rgba(59, 130, 246, 0.05);
+    }
+  }
 }
 
 .zoom-controls {
@@ -861,5 +1440,33 @@ onUnmounted(() => {
   width: 1px;
   height: 16px;
   background: #e5e7eb;
+}
+
+// 工具栏折叠按钮样式
+.toolbar-toggle-collapsed {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  
+  .toggle-btn {
+    padding: 6px 12px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    
+    &:hover {
+      background: #f3f4f6;
+      border-color: #d1d5db;
+    }
+  }
 }
 </style>

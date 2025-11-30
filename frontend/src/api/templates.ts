@@ -28,6 +28,13 @@ export const templateAPI = {
   },
 
   /**
+   * 获取单个模板详情
+   */
+  async getTemplate(templateId: string): Promise<any> {
+    return apiClient.get(`/templates/${templateId}`)
+  },
+
+  /**
    * 获取分类列表
    */
   async getCategories(): Promise<any> {
@@ -47,5 +54,6 @@ export const templateAPI = {
 
 // 导出为单独函数（与store中的导入保持一致）
 export const getTemplates = templateAPI.getTemplates
+export const getTemplate = templateAPI.getTemplate
 export const getCategories = templateAPI.getCategories
 export const recommendTemplates = templateAPI.recommendTemplates

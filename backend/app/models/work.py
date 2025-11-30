@@ -2,7 +2,7 @@
 用户作品数据库模型
 """
 from datetime import datetime
-from sqlalchemy import Column, String, Text, BigInteger, DateTime, JSON, ForeignKey, Index
+from sqlalchemy import Column, String, Text, Integer, DateTime, JSON, ForeignKey, Index
 from app.models.base import Base
 
 
@@ -11,7 +11,7 @@ class UserWork(Base):
     __tablename__ = "user_works"
     
     # 字段定义
-    id = Column(BigInteger, primary_key=True, autoincrement=True, comment="作品ID")
+    id = Column(Integer, primary_key=True, autoincrement=True, comment="作品ID")
     user_id = Column(String(100), index=True, nullable=True, comment="用户标识")
     title = Column(String(200), nullable=True, comment="作品标题")
     template_id = Column(String(100), ForeignKey('templates.id'), nullable=False, comment="使用的模板ID")

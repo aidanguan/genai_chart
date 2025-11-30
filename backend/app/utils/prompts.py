@@ -171,9 +171,13 @@ def get_data_extract_prompt(
 关键字段说明：
 - title: 信息图的标题（如果文本没有明确标题，可以根据内容生成一个简洁的标题）
 - desc: 信息图的描述或副标题
-- items: 数据项列表，每个item包含label（标签）、desc（描述）、icon（图标）等字段
+- items: 数据项列表，每个item包含label（标签）、desc（描述）、icon（图标）、value（数值）等字段
   * label: 简短的标题或名称
   * desc: 详细的描述内容
+  * value: **对于图表类型(chart)模板必填**，从文本中提取的数值数据(纯数字，不带单位)
+    - 示例: "北京1000万" → value: 1000
+    - 示例: "增长30%" → value: 30  
+    - 示例: "销售额500" → value: 500
   * icon: **必须生成**图标字段，使用iconify格式"icon:mdi/图标名"（仅使用mdi集合），例如：
     - 需求分析: "icon:mdi/chart-line" 或 "icon:mdi/clipboard-text"
     - 设计: "icon:mdi/palette" 或 "icon:mdi/draw"
@@ -183,6 +187,58 @@ def get_data_extract_prompt(
     - 分析: "icon:mdi/magnify" 或 "icon:mdi/chart-bar"
     - 创新: "icon:mdi/lightbulb" 或 "icon:mdi/creation"
     请根据每个步骤的含义选择合适的mdi图标，可在 https://icon-sets.iconify.design/mdi/ 查找更多图标
+  * children: **对于对比型(compare-binary-horizontal)模板必填**，子项列表，用于表示每个根节点下的子数据项
+
+## 特殊结构的数据格式说明：
+
+### 对比型模板 (compare-binary-horizontal)
+对比型模板使用特殊的两层数据结构，items数组必须包含**恰好2个根节点**（左右两侧），每个根节点包含children数组：
+
+示例结构：
+{{
+  "data": {{
+    "title": "对比主题",
+    "desc": "对比说明",
+    "items": [
+      {{
+        "label": "左侧标题(如:优势/iPhone/方案A)",
+        "children": [
+          {{
+            "label": "子项1标题",
+            "desc": "子项1描述",
+            "icon": "icon:mdi/check-circle"
+          }},
+          {{
+            "label": "子项2标题",
+            "desc": "子项2描述",
+            "icon": "icon:mdi/star"
+          }}
+        ]
+      }},
+      {{
+        "label": "右侧标题(如:劣势/Android/方案B)",
+        "children": [
+          {{
+            "label": "子项1标题",
+            "desc": "子项1描述",
+            "icon": "icon:mdi/alert-circle"
+          }},
+          {{
+            "label": "子项2标题",
+            "desc": "子项2描述",
+            "icon": "icon:mdi/close-circle"
+          }}
+        ]
+      }}
+    ]
+  }}
+}}
+
+**关键要求**：
+- items数组必须有且仅有2个根节点元素
+- 每个根节点必须有children数组
+- 根节点的label表示左右两侧的标题
+- children中的每个对象包含label、desc和icon字段
 
 请严格按照JSON格式返回提取的数据，**不要包含任何markdown代码块标记(如```json)**,不要包含任何其他文字说明,直接返回JSON对象:
 
@@ -195,6 +251,7 @@ def get_data_extract_prompt(
       {{
         "label": "项目标签",
         "desc": "项目描述",
+        "value": 数值(仅用于chart类型,纯数字不带单位),
         "icon": "icon:mdi/相关图标名"
       }}
     ]

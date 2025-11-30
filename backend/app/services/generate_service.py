@@ -392,6 +392,11 @@ class GenerateService:
         if template_id == 'org-tree':
             extracted_data = self._convert_to_tree_data(extracted_data)
         
+        # 如果是对比型模板(compare-binary-horizontal),需要将数据转换为两层结构
+        if template_id in ['compare-binary-vs', 'compare-binary-horizontal', 'comparison-two-column'] or \
+           (template.get('category') == 'comparison' and 'compare' in template_id):
+            extracted_data = self._convert_to_comparison_structure(extracted_data)
+        
         # 获取AntV模板配置映射
         from app.services.template_service import TEMPLATE_DESIGN_MAP
         template_design = TEMPLATE_DESIGN_MAP.get(template_id)
@@ -494,6 +499,101 @@ class GenerateService:
         
         return {
             "data": tree_data,
+            "themeConfig": extracted_data.get('themeConfig', {})
+        }
+    
+    def _convert_to_comparison_structure(self, extracted_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        将扫平的items数组转换为对比型所需的两层结构
+        
+        对比型需要的数据结构：
+        {
+          "items": [
+            {
+              "label": "左侧标题",
+              "children": [{"label": "...", "desc": "...", "icon": "..."}]
+            },
+            {
+              "label": "右侧标题",
+              "children": [{"label": "...", "desc": "...", "icon": "..."}]
+            }
+          ]
+        }
+        
+        Args:
+            extracted_data: 原始提取数据，包含扫平的 items 数组
+        
+        Returns:
+            Dict: 转换为两层结构的数据
+        """
+        data = extracted_data.get('data', {})
+        items = data.get('items', [])
+        
+        if not items or len(items) < 2:
+            # 如果没有足够的数据，直接返回
+            return extracted_data
+        
+        # 尝试智能分组：将items分为左右两组
+        # 策略：前半部分为左侧，后半部分为右侧
+        mid_index = len(items) // 2
+        left_items = items[:mid_index]
+        right_items = items[mid_index:]
+        
+        # 尝试从 items 中提取左右标题
+        # 如果 label 包含“方案A”、“iPhone”等，可以作为标题
+        left_label = "左侧"
+        right_label = "右侧"
+        
+        # 尝试从第一个 item 的 label 中提取标题
+        if left_items:
+            first_label = left_items[0].get('label', '')
+            # 尝试提取“方案A”、“iPhone”等实体名
+            for keyword in ['方案A', 'iPhone', '优势', '左', 'A']:
+                if keyword in first_label:
+                    left_label = keyword
+                    break
+        
+        if right_items:
+            first_label = right_items[0].get('label', '')
+            for keyword in ['方案B', 'Android', '劣势', '右', 'B']:
+                if keyword in first_label:
+                    right_label = keyword
+                    break
+        
+        # 构建两层结构
+        comparison_data = {
+            "title": data.get('title', ''),
+            "desc": data.get('desc', ''),
+            "items": [
+                {
+                    "label": left_label,
+                    "children": [
+                        {
+                            "label": item.get('label', ''),
+                            "desc": item.get('desc', ''),
+                            "icon": item.get('icon', '')
+                        }
+                        for item in left_items
+                    ]
+                },
+                {
+                    "label": right_label,
+                    "children": [
+                        {
+                            "label": item.get('label', ''),
+                            "desc": item.get('desc', ''),
+                            "icon": item.get('icon', '')
+                        }
+                        for item in right_items
+                    ]
+                }
+            ]
+        }
+        
+        logger.info(f"[对比型转换] 将{len(items)}个项转换为左({len(left_items)})右({len(right_items)})两组")
+        
+        return {
+            "data": comparison_data,
             "themeConfig": extracted_data.get('themeConfig', {})
         }
 

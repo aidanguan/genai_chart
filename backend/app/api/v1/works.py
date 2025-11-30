@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException, Query
 from typing import Optional
 from app.schemas.common import APIResponse
 from app.schemas.work import WorkCreateRequest, WorkResponse
-from app.utils.db import get_db
+from app.utils.db import get_db_session
 from app.repositories.work_repo import WorkRepository
 from app.models.work import UserWork
 
@@ -22,7 +22,7 @@ async def create_work(request: WorkCreateRequest):
     - **inputText**: 用户输入的原始文本
     - **infographicConfig**: 完整的Infographic配置
     """
-    db = get_db()
+    db = get_db_session()
     try:
         repo = WorkRepository(db)
         
@@ -44,7 +44,10 @@ async def create_work(request: WorkCreateRequest):
             message="作品保存成功"
         )
     except Exception as e:
+        db.rollback()
         raise HTTPException(status_code=500, detail=f"保存作品失败: {str(e)}")
+    finally:
+        db.close()
 
 
 @router.get("", summary="获取作品列表")
@@ -60,7 +63,7 @@ async def get_works(
     - **page**: 页码(默认1)
     - **pageSize**: 每页数量(默认20)
     """
-    db = get_db()
+    db = get_db_session()
     try:
         repo = WorkRepository(db)
         works, total = repo.get_all(user_id=userId, page=page, page_size=pageSize)
@@ -77,6 +80,8 @@ async def get_works(
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"获取作品列表失败: {str(e)}")
+    finally:
+        db.close()
 
 
 @router.get("/{work_id}", summary="获取作品详情")
@@ -86,7 +91,7 @@ async def get_work_detail(work_id: int):
     
     - **work_id**: 作品ID
     """
-    db = get_db()
+    db = get_db_session()
     try:
         repo = WorkRepository(db)
         work = repo.get_by_id(work_id)
@@ -103,3 +108,5 @@ async def get_work_detail(work_id: int):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"获取作品详情失败: {str(e)}")
+    finally:
+        db.close()
