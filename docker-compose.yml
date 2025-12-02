@@ -8,7 +8,7 @@ services:
       dockerfile: backend/Dockerfile
     container_name: genai-chart-backend
     ports:
-      - "8000:8000"
+      - "8001:8000"
     volumes:
       - ./backend:/app
       - ./backend/data:/app/data
@@ -39,7 +39,7 @@ services:
       dockerfile: frontend/Dockerfile
     container_name: genai-chart-frontend
     ports:
-      - "80:80"
+      - "3000:80"
     depends_on:
       - backend
     restart: unless-stopped

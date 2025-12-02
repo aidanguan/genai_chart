@@ -9,9 +9,6 @@ COPY frontend/package*.json ./
 # 安装依赖
 RUN npm install
 
-# 复制 antv_infographic 依赖
-COPY antv_infographic/infographic /antv_infographic/infographic
-
 # 复制应用代码
 COPY frontend/. .
 

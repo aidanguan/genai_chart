@@ -7,8 +7,7 @@ export default defineConfig({
   plugins: [vue()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
-      '@antv/infographic': path.resolve(__dirname, '../antv_infographic/infographic/esm')
+      '@': path.resolve(__dirname, './src')
     }
   },
   server: {
