@@ -110,3 +110,32 @@ async def get_work_detail(work_id: int):
         raise HTTPException(status_code=500, detail=f"获取作品详情失败: {str(e)}")
     finally:
         db.close()
+
+
+@router.delete("/{work_id}", summary="删除作品")
+async def delete_work(work_id: int):
+    """
+    删除指定的作品
+    
+    - **work_id**: 作品ID
+    """
+    db = get_db_session()
+    try:
+        repo = WorkRepository(db)
+        success = repo.delete(work_id)
+        
+        if not success:
+            raise HTTPException(status_code=404, detail=f"作品不存在: {work_id}")
+        
+        return APIResponse(
+            success=True,
+            data=None,
+            message="删除作品成功"
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"删除作品失败: {str(e)}")
+    finally:
+        db.close()

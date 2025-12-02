@@ -86,9 +86,17 @@
       <div class="modal-content">
         <div class="modal-header">
           <h2 class="modal-title">{{ selectedWork?.title || '信息图作品' }}</h2>
-          <button class="close-button" @click="closePreview">
-            <X :size="24" />
-          </button>
+          <div class="header-actions">
+            <button class="action-button" @click="handleViewCode" title="查看代码">
+              <Code2 :size="20" />
+            </button>
+            <button class="action-button action-delete" @click="(e) => selectedWork && handleDelete(selectedWork, e)" title="删除作品">
+              <Trash2 :size="20" />
+            </button>
+            <button class="close-button" @click="closePreview">
+              <X :size="24" />
+            </button>
+          </div>
         </div>
         <div class="modal-body">
           <div class="template-info">
@@ -112,6 +120,15 @@
           <div class="template-preview">
             <div ref="detailPreviewRef" class="detail-preview-canvas"></div>
           </div>
+          
+          <!-- 代码查看器 -->
+          <div v-if="showCodeViewer" class="code-viewer">
+            <div class="code-header">
+              <h3 class="code-title">信息图配置</h3>
+              <button class="copy-button" @click="handleCopyCode">复制代码</button>
+            </div>
+            <pre class="code-content"><code>{{ codeContent }}</code></pre>
+          </div>
         </div>
       </div>
     </div>
@@ -120,9 +137,9 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick, watch } from 'vue'
-import { X } from 'lucide-vue-next'
+import { X, Trash2, Code2 } from 'lucide-vue-next'
 import WorkspaceHeader from '@/views/AIWorkspace/components/WorkspaceHeader.vue'
-import { getWorks } from '@/api/work'
+import { getWorks, deleteWork } from '@/api/work'
 import { templateAPI } from '@/api/templates'
 import { Infographic, registerResourceLoader, loadSVGResource } from '@antv/infographic'
 
@@ -176,6 +193,8 @@ const detailPreviewRef = ref<HTMLElement | null>(null)
 const templates = ref<Map<string, TemplateInfo>>(new Map())
 const categories = ref<Category[]>([])
 const selectedCategory = ref<string>('')
+const showCodeViewer = ref(false)
+const codeContent = ref('')
 
 // 计算属性
 const totalCount = computed(() => filteredWorks.value.length)
@@ -243,9 +262,57 @@ const handleWorkClick = (work: UserWork) => {
 
 const closePreview = () => {
   selectedWork.value = null
+  showCodeViewer.value = false
   // 清空详情预览容器
   if (detailPreviewRef.value) {
     detailPreviewRef.value.innerHTML = ''
+  }
+}
+
+// 删除作品
+const handleDelete = async (work: UserWork, event: Event) => {
+  event.stopPropagation() // 阻止冒泡
+  
+  if (!confirm(`确定要删除作品 "${work.title || '信息图作品'}" 吗？`)) {
+    return
+  }
+  
+  try {
+    const result = await deleteWork(work.id)
+    if (result.success) {
+      // 从列表中移除
+      works.value = works.value.filter(w => w.id !== work.id)
+      // 如果当前正在查看被删除的作品，关闭弹窗
+      if (selectedWork.value?.id === work.id) {
+        closePreview()
+      }
+      alert('删除成功')
+    } else {
+      alert('删除失败：' + (result.message || '未知错误'))
+    }
+  } catch (error) {
+    console.error('删除作品失败:', error)
+    alert('删除失败，请稍后重试')
+  }
+}
+
+// 查看代码
+const handleViewCode = (event: Event) => {
+  event.stopPropagation()
+  if (selectedWork.value) {
+    codeContent.value = JSON.stringify(selectedWork.value.infographicConfig, null, 2)
+    showCodeViewer.value = true
+  }
+}
+
+// 复制代码
+const handleCopyCode = async () => {
+  try {
+    await navigator.clipboard.writeText(codeContent.value)
+    alert('代码已复制到剪贴板')
+  } catch (error) {
+    console.error('复制失败:', error)
+    alert('复制失败，请手动复制')
   }
 }
 
@@ -679,6 +746,39 @@ watch(selectedCategory, () => {
   border-bottom: 1px solid #e5e7eb;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.action-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #3b82f6;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &:hover {
+    background: #eff6ff;
+    color: #2563eb;
+  }
+  
+  &.action-delete {
+    color: #ef4444;
+    
+    &:hover {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+  }
+}
+
 .modal-title {
   font-size: 1.5rem;
   font-weight: 700;
@@ -765,6 +865,66 @@ watch(selectedCategory, () => {
   :deep(svg) {
     max-width: 100%;
     max-height: 100%;
+  }
+}
+
+.code-viewer {
+  margin-top: 2rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.code-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.copy-button {
+  padding: 0.5rem 1rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &:hover {
+    background: #2563eb;
+  }
+  
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.code-content {
+  margin: 0;
+  padding: 1.5rem;
+  background: #1f2937;
+  color: #e5e7eb;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  overflow-x: auto;
+  max-height: 500px;
+  overflow-y: auto;
+  
+  code {
+    color: #e5e7eb;
   }
 }
 </style>

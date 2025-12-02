@@ -79,3 +79,21 @@ class WorkRepository:
         ).offset((page - 1) * page_size).limit(page_size).all()
         
         return works, total
+    
+    def delete(self, work_id: int) -> bool:
+        """
+        删除作品
+        
+        Args:
+            work_id: 作品ID
+        
+        Returns:
+            是否删除成功
+        """
+        work = self.get_by_id(work_id)
+        if not work:
+            return False
+        
+        self.db.delete(work)
+        self.db.commit()
+        return True
