@@ -1,0 +1,5 @@
+{
+  "text": "方案1的优势是成本低、实施快,劣势是功能有限。方案2的优势是功能强大、扩展性好,劣势是成本高、周期长。",
+  "templateId": "compare-hierarchy-left-right",
+  "llmProvider": "system"
+}

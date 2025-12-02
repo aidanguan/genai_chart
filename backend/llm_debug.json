@@ -1,0 +1,58 @@
+{
+  "user_text": "任务要分紧急性和重要性。分为紧急且重要，紧急不重要，不紧急但重要，不紧急也不重要",
+  "template_id": "matrix-2x2",
+  "llm_response": {
+    "template": "matrix-2x2",
+    "data": {
+      "title": "任务紧急性-重要性四象限",
+      "desc": "根据任务的紧急程度和重要程度，将任务划分为四类：紧急且重要、紧急不重要、不紧急但重要、不紧急也不重要。",
+      "xAxis": "重要性",
+      "yAxis": "紧急性",
+      "quadrants": [
+        {
+          "label": "紧急且重要",
+          "items": [
+            {
+              "label": "紧急且重要的任务",
+              "desc": "需要立即处理并且对目标影响很大的任务，例如紧迫的项目截止、突发的重大问题。",
+              "icon": "icon:mdi/alarm-light"
+            }
+          ]
+        },
+        {
+          "label": "紧急但不重要",
+          "items": [
+            {
+              "label": "紧急但不重要的任务",
+              "desc": "时间上很急，但对核心目标影响不大的任务，例如部分打断、杂务、他人可代办事项。",
+              "icon": "icon:mdi/bell-alert"
+            }
+          ]
+        },
+        {
+          "label": "不紧急但重要",
+          "items": [
+            {
+              "label": "不紧急但重要的任务",
+              "desc": "暂时不急，却对长期目标和成长很关键的任务，例如学习、规划、能力提升。",
+              "icon": "icon:mdi/target-variant"
+            }
+          ]
+        },
+        {
+          "label": "不紧急也不重要",
+          "items": [
+            {
+              "label": "不紧急也不重要的任务",
+              "desc": "既不急也不重要的琐事或消耗时间的活动，例如无目的刷手机、低价值的消遣。",
+              "icon": "icon:mdi/sleep"
+            }
+          ]
+        }
+      ]
+    },
+    "themeConfig": {
+      "palette": "antv"
+    }
+  }
+}
