@@ -506,6 +506,7 @@ function renderInfographic(cfg: any) {
     // 渲染
     infographicInstance.render()
     console.log('信息图渲染成功')
+    console.log('Infographic实例方法:', Object.getOwnPropertyNames(Object.getPrototypeOf(infographicInstance)))
     message.success('信息图渲染成功')
     
     // 渲染完成后，为SVG元素添加点击事件监听器
@@ -839,30 +840,93 @@ async function handleExport({ key }: { key: string }) {
     
     message.loading(`正在导出${key.toUpperCase()}...`, 0)
     
-    // 检查是否有渲染实例
-    if (!infographicInstance) {
+    // 检查是否有SVG元素
+    const svgElement = canvasRef.value?.querySelector('svg')
+    if (!svgElement) {
       message.destroy()
       message.warning('请先生成信息图')
       return
     }
     
-    // PNG 和 SVG 使用前端直接导出
+    // PNG 和 SVG 导出
     if (key === 'png' || key === 'svg') {
       try {
-        const dataURL = await infographicInstance.toDataURL({
-          type: key as 'png' | 'svg',
-          dpr: 2  // 高清输出
-        })
+        // 尝试使用 Infographic 原生方法（如果存在）
+        if (infographicInstance && typeof infographicInstance.toDataURL === 'function') {
+          console.log('使用 Infographic 原生 toDataURL 方法')
+          const dataURL = await infographicInstance.toDataURL({
+            type: key as 'png' | 'svg',
+            dpr: 2
+          })
+          
+          const link = document.createElement('a')
+          link.href = dataURL
+          link.download = `infographic_${Date.now()}.${key}`
+          link.click()
+          
+          message.destroy()
+          message.success(`${key.toUpperCase()}导出成功`)
+          return
+        }
         
-        // 下载文件
-        const link = document.createElement('a')
-        link.href = dataURL
-        link.download = `infographic_${Date.now()}.${key}`
-        link.click()
+        // 如果原生方法不存在，使用 DOM 方式导出
+        console.log('使用 DOM 方式导出')
+        const svgContent = new XMLSerializer().serializeToString(svgElement)
         
-        message.destroy()
-        message.success(`${key.toUpperCase()}导出成功`)
+        if (key === 'svg') {
+          // SVG直接下载
+          const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' })
+          const url = URL.createObjectURL(blob)
+          const link = document.createElement('a')
+          link.href = url
+          link.download = `infographic_${Date.now()}.svg`
+          link.click()
+          URL.revokeObjectURL(url)
+          
+          message.destroy()
+          message.success('SVG导出成功')
+        } else if (key === 'png') {
+          // PNG: 使用后端API导出（避免跨域问题）
+          console.log('调用后端API导出PNG...')
+          const { exportInfographic, getDownloadUrl } = await import('@/api/export')
+          
+          const response = await exportInfographic({
+            svgContent,
+            format: 'png',
+            filename: `infographic_${Date.now()}.png`,
+            width: Math.round(svgElement.getBoundingClientRect().width * 2),
+            height: Math.round(svgElement.getBoundingClientRect().height * 2),
+            scale: 2
+          })
+          
+          if (response.success && response.data) {
+            // 使用 fetch + Blob 方式下载文件，避免浏览器安全限制
+            const downloadUrl = getDownloadUrl(response.data.filename)
+            console.log('下载URL:', downloadUrl)
+            
+            const fetchResponse = await fetch(downloadUrl)
+            if (!fetchResponse.ok) {
+              throw new Error('文件下载失败')
+            }
+            
+            const blob = await fetchResponse.blob()
+            const blobUrl = URL.createObjectURL(blob)
+            const link = document.createElement('a')
+            link.href = blobUrl
+            link.download = response.data.filename
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+            URL.revokeObjectURL(blobUrl)
+            
+            message.destroy()
+            message.success('PNG导出成功')
+          } else {
+            throw new Error(response.error || 'PNG导出失败')
+          }
+        }
       } catch (error: any) {
+        console.error('导出失败:', error)
         message.destroy()
         message.error(`导出失败: ${error.message || '未知错误'}`)
       }
@@ -899,14 +963,24 @@ async function handleExport({ key }: { key: string }) {
         if (response.success && response.data) {
           message.destroy()
           
-          // 下载文件
+          // 使用 fetch + Blob 方式下载文件，避免浏览器安全限制
           const downloadUrl = getDownloadUrl(response.data.filename)
           console.log('下载URL:', downloadUrl)
           
+          const fetchResponse = await fetch(downloadUrl)
+          if (!fetchResponse.ok) {
+            throw new Error('文件下载失败')
+          }
+          
+          const blob = await fetchResponse.blob()
+          const blobUrl = URL.createObjectURL(blob)
           const link = document.createElement('a')
-          link.href = downloadUrl
+          link.href = blobUrl
           link.download = response.data.filename
+          document.body.appendChild(link)
           link.click()
+          document.body.removeChild(link)
+          URL.revokeObjectURL(blobUrl)
           
           message.success('PPTX导出成功')
         } else {

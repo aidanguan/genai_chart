@@ -61,8 +61,8 @@ export async function getExportFormats(): Promise<APIResponse<ExportFormat[]>> {
  * @returns 下载URL
  */
 export function getDownloadUrl(filename: string): string {
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1'
-  return `${baseUrl}/export/download/${filename}`
+  // 使用相对路径，通过nginx代理访问后端
+  return `/api/v1/export/download/${filename}`
 }
 
 /**

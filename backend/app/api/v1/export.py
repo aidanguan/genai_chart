@@ -145,10 +145,15 @@ async def download_file(filename: str):
     ext = os.path.splitext(filename)[1].lower()
     media_type = media_types.get(ext, "application/octet-stream")
     
+    # 设置 Content-Disposition 头，确保浏览器以下载方式处理
     return FileResponse(
         path=str(filepath),
         filename=filename,
-        media_type=media_type
+        media_type=media_type,
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Access-Control-Expose-Headers": "Content-Disposition"
+        }
     )
 
 

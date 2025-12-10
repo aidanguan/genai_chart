@@ -75,6 +75,9 @@ class ExportService:
         
         filepath = self.temp_dir / filename
         
+        # 🔄 关键修复：将 foreignObject 转换为 text 元素，cairosvg 不支持 foreignObject
+        svg_content = self._convert_svg_for_ppt(svg_content)
+        
         # 转换SVG到PNG
         cairosvg.svg2png(
             bytestring=svg_content.encode('utf-8'),
@@ -113,6 +116,9 @@ class ExportService:
             filename = "infographic.pdf"
         
         filepath = self.temp_dir / filename
+        
+        # 🔄 关键修复：将 foreignObject 转换为 text 元素，cairosvg 不支持 foreignObject
+        svg_content = self._convert_svg_for_ppt(svg_content)
         
         # 转换SVG到PDF
         cairosvg.svg2pdf(
